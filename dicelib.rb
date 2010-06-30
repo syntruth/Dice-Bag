@@ -11,6 +11,8 @@ module Dice
   TEST_DSTR2 = "2d10 e10"
   TEST_DSTR3 = "2d8 +4 r5"
 
+  COMPLEX_DSTR = "[(Stats) #{TEST_DSTR}], [#{TEST_DSTR2}] + [#{TEST_DSTR3}]"
+
   EXPLODE_LIMIT = 20
 
   DICE_HELP = "The dice string is #x #d# e# *# +/-# !# r# where:\n" +
@@ -25,6 +27,8 @@ module Dice
     "Example: (Roll Stats) 6x 4d6 !3 " + 
     "-- means roll 4d6, keep the best 3, 6 times."
 
+  DICE_STRING_REGEX = /\]\s*([\+\-\,])\s*\[/
+
   DICE_REGEX = /(\d{1,2}x)?    # How many times?
     (\d{1,2})?[dD](\d{1,3}|\%) # The dice to roll, xDx format
     (e\d{0,2})?                # Explode value
@@ -38,6 +42,17 @@ module Dice
     :do_sort => true,
     :do_tally => true
   }
+
+
+  # Dice Error Exception
+  class DiceError < Exception
+    # nop
+  end
+
+  # DiceRoll Structure
+  # This is returned from roll(), either a single
+  # instance or an array of instances.
+  DiceRoll = Struct.new(:dice_string, :total, :results, :desc)
 
   # Subclass of Hash to hold the parts of a dice
   # string, with defaults.
@@ -55,10 +70,57 @@ module Dice
     end
   end
 
-  # Result structure
-  # This is returned from roll(), either a single
-  # instance or an array of instances.
-  Result = Struct.new(:dice_string, :total, :results, :desc)
+  # Class to hold the entire results from a given dice
+  # string. Will contain the DiceRoll instances and total
+  # from each section of a dice string.
+  class Result
+
+    attr :rolls
+    attr :total
+
+    def initialize(rolls=[], total=0)
+      @rolls = rolls
+      @total = total
+    end
+
+    def +(rolls=[])
+      @rolls += rolls
+      @total += get_subtotal(rolls)
+    end
+
+    def -(rolls=[])
+      @rolls += rolls
+      @total -= get_subtotal(rolls)
+    end
+
+  private
+
+    def get_subtotal(rolls)
+      return rolls.inject(0) {|t, roll| t += roll.total}
+    end
+
+  end
+
+  ###########
+  # Methods #
+  ###########
+
+  # This is the main roll() method. It takes either a dice
+  # string or an instance of DiceParts, then delegates to the
+  # correct method for resolution.
+  # Raises DiceError if str_or_diceparts are not of those 
+  # classes.
+  def roll(str_or_diceparts)
+    case str_or_diceparts
+    when String
+      return roll_dice_string(str_or_diceparts)
+    when DiceParts
+      return roll_dice_parts(str_or_diceparts)
+    end
+
+    # Oops, not the correct classes.
+    raise DiceError, "Dice::roll() parameter is not a String or DiceParts."
+  end
 
   # Remove spaces and down case.
   def clean_dice_string(dstr="")
@@ -85,6 +147,7 @@ module Dice
       # Set it to the max-value of the die.
       parts[3] = parts[2] if parts[3] == "e"
 
+      # Convert them to numbers.
       parts.collect! do |i|
         if i.nil?
           i = 0
@@ -105,7 +168,7 @@ module Dice
     end
 
     # ...and now, see if we have a roll descriptor.
-    desc = dstr.match(/^\((.*?)\)|\((.*?)\)$/)
+    desc = dstr.match(/^\((.*?)\)/)
     if desc and desc.captures.any?
       dice_parts[:desc] = desc.captures[0]
     end
@@ -164,11 +227,11 @@ module Dice
 
   # Takes an instance of DiceParts, that should have been 
   # returned from parse_dice_string() above. Returns an 
-  # array of Result instances, unless :single_result is 
+  # array of DiceRoll instances, unless :single_result is 
   # set to true, then only returns the first result, 
   # irregardless of the :times value in the DiceParts
   # instance.
-  def roll(dice_parts, single_result=false, options = {})
+  def roll_dice_parts(dice_parts, single_result=false, options = {})
     all_results = []
 
     opts = OPTION_DEFAULTS.dup.update(options)
@@ -223,7 +286,8 @@ module Dice
 
       dstr = build_dice_string(dice_parts)
 
-      all_results.push(Result.new(dstr, total, disp_results, dice_parts[:desc]))
+      res = DiceRoll.new(dstr, total, disp_results, dice_parts[:desc])
+      all_results.push(res)
     end
 
     if single_result
@@ -231,6 +295,46 @@ module Dice
     else
       return all_results
     end
+  end
+
+
+  # Generates results based on a dice string. 
+  # It will return an array of Result instances.
+  def roll_dice_string(dstr="")
+    results = []
+      
+    # Default operand is to add rolls.
+    op = "+"
+
+    rolls = dstr.split(DICE_STRING_REGEX).collect do |s|
+      s.gsub(/[\[\] ]/, "")
+    end
+
+    current = Result.new()
+
+    rolls.each do |str|
+      
+      case str
+      when "+", "-"
+        op = str
+
+      when ","
+        # Reset operand to add.
+        op = "+"
+
+        results.push(current)
+        current = Result.new()
+
+      else 
+        roll = roll_dice_parts(parse_dice_string(str))
+        current.send(op, roll)
+      end
+    end
+
+    # Push our last Result.
+    results.push(current)
+
+    return results
   end
 
   # The following methods require a hash returned from
@@ -270,16 +374,32 @@ end
 
 module Roll
 
+  # This class encapsulates a dice roll of a given
+  # string, which can then be used to roll that 
+  # "group" of dice over and over, with an optional
+  # history of of the rolls.
+
   class Roll
     include Dice
 
     attr_reader :dice
     attr_reader :dice_parts
+    attr_reader :history
 
-    def initialize(dstr="1d6", do_single=false)
+    # Builds the Roll object. 
+    # dstr is the dice string to roll. Note, this should not
+    # be a complex dice string, but a simple one.
+    # do_single, if set to true, will only return the first
+    # result from an array of results.
+    # history is how many results to remember from past rolls.
+    # Set this to zero if you do not wish to keep a history of 
+    # rolls.
+    def initialize(dstr="1d6", do_single=false, history = 10)
       @dice_parts = parse_dice_string(dstr)
       @dice = build_dice_string(@dice_parts)
       @do_single_result = do_single
+      @history = []
+      @history_length = history
     end
 
     def roll(mod=0, single_result=false)
@@ -295,7 +415,17 @@ module Roll
       # per-roll result is false.
       single_result = @do_single_result if not single_result
 
-      return super(parts, single_result)
+      result = roll_dice_parts(parts, single_result)
+
+      self.add_history(result) unless @history_length.zero?
+
+      return result
+    end
+
+    def add_history(result)
+      @history.insert(0, result[0])
+      @history.slice!(10, @history.length())
+      return nil
     end
 
     def maximum
