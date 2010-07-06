@@ -302,7 +302,7 @@ module Dice
   # This takes a complex dice string on instatiation,
   # parses it into it's individual parts, and then with
   # a call to the roll() method, will return an array of
-  # results. Each element of the returned away will be an
+  # results. Each element of the returned array will be an
   # instance of the ComplexResult structure, representing
   # a section of the complex dice string.
   class Roll
@@ -321,6 +321,11 @@ module Dice
         label = ""
 
         section.each do |op, part|
+          
+          # If this is a RollPart instance,
+          # ensure fresh results.
+          part.roll() if part.is_a?(RollPart)
+            
           case op
           when :label
             label = part.value()
