@@ -77,4 +77,58 @@ Within the dice library itself, simple (xDx) strings are limited to 2
 digits for all parts of the string except for the sides of the given
 die, which can be up to 3 digits.
 
+Using the Dice Library
+----------------------
 
+Using the library is rather straight forward:
+
+    require 'dicelib'
+
+    include Dice
+
+    dice = Roll.new("(Damage) 2d8 + 5 + 1d6")
+
+    results = dice.roll()
+
+    results.each do |result|
+      puts "%10s: %s" % [result.label, result.total]
+    end
+
+This would output something like the following:
+
+    Damage: 15
+
+It is possible to get the individual sections values as well:
+
+    results.each do |result|
+      result.parts.each do |part|
+        puts "%-4s: %s" % [part.to_s(), part.result()]
+      end
+    end
+
+For the above given dice string, would print something like this:
+
+    2d8: 7
+      5: 5
+    1d6: 3
+
+Also, if you are curious to see how the complex dice string was parsed,
+you can retrieved the parsed value from the Roll instance using the
+parsed() method:
+
+    parsed = roll.parsed()
+
+For the above given dice string, this returns a nested array of values:
+
+    [
+      [
+        [:label, "Damage"],
+        [:start, "2d8"],
+        [:add, 5],
+        [:add, "1d6"]
+      ]
+    ]
+
+...note, however, that each sections 2nd element is actually a class 
+instance of SimplePart or one of it's subclasses. I used strings above
+to simply show the format.
