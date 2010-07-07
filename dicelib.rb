@@ -56,6 +56,10 @@ module Dice
       return "%s: %s" % [@total, t]
     end
 
+    def <=>(other)
+      return @total <=> other.total()
+    end
+
   end
 
   # This models a complex dice string result.

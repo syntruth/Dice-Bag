@@ -1,6 +1,9 @@
 Changes for Version 2.1
 =======================
 
+* Added <=>() to the RollResult class to handle sorting of results based
+  on the total.
+
 * Added a parsed() method to ComplexResult, that holds that part of the
   complex strings parsed data.
 
