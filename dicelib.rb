@@ -1,6 +1,6 @@
 # Name   : Dice Library for Ruby
 # Author : Randy Carnahan
-# Version: 2.0
+# Version: 2.1
 # License: LGPL
 
 module Dice
@@ -33,15 +33,51 @@ module Dice
   /xi
 
   ###########
-  # Structs #
-  ###########
-
-  RollResult = Struct.new(:total, :tally)
-  ComplexResult = Struct.new(:total, :parts, :label)
-
-  ###########
   # Classes #
   ###########
+
+  # This models a single xDx string result.
+  class RollResult
+    attr :total
+
+    def initialize(total=0, tally=[])
+      @total = total
+      @tally = tally
+    end
+
+    def tally(do_sort=true)
+      t = @tally.dup()
+      t.sort!.reverse! if do_sort
+      return t
+    end
+
+    def to_s(do_tally_sort=true)
+      t = "[%s]" % self.tally(do_tally_sort).join("][")
+      return "%s: %s" % [@total, t]
+    end
+
+  end
+
+  # This models a complex dice string result.
+  class ComplexResult
+    attr :total
+    attr :sections
+    attr :label
+
+    def initialize(total=0, sections=[], label="")
+      @total    = total
+      @sections = sections
+      @label    = label
+    end
+
+    def to_s
+      if @label.empty?
+        return @total.to_s()
+      else
+        return "%s: %s" % [@label, @total]
+      end
+    end
+  end
 
   # The most simplest of a part. If a given part of
   # a dice string is not a Label, Fixnum, or a xDx part
@@ -96,7 +132,7 @@ module Dice
     attr :parts
 
     def initialize(dstr)
-      @last_roll = []
+      @result = []
       @value = dstr
 
       # Our Default Values
@@ -156,7 +192,7 @@ module Dice
     # Checks to see if this instance has rolled yet
     # or not.
     def has_rolled?
-      return @last_roll.empty? ? false : true
+      return @result.empty? ? false : true
     end
 
     # Rolls a single die from the xDx string.
@@ -171,11 +207,11 @@ module Dice
       return num
     end
 
-    # Rolls the dice, saving the results in the @last_roll
-    # instance variable. @last_roll is cleared before the 
+    # Rolls the dice, saving the results in the @result
+    # instance variable. @result is cleared before the 
     # roll is handled.
     def roll
-      @last_roll = []
+      @result = []
 
       @parts[:times].times do
 
@@ -199,38 +235,36 @@ module Dice
           end
         end
 
-        disp_results = results.dup()
+        tally = results.dup()
         results.sort!.reverse!
 
         if @parts[:keep] > 0
-          sub_results = results[0 ... @parts[:keep]]
-        else
-          sub_results = results.dup()
+          results = results[0 ... @parts[:keep]]
         end
-        
-        total = sub_results.inject(0) {|t, i| t += i}
+         
+        total = results.inject(0) {|t, i| t += i}
         total = total * @parts[:mult] if @parts[:mult] > 1
 
-        res = RollResult.new(total, disp_results)
+        res = RollResult.new(total, tally)
 
-        @last_roll.push(res)
+        @result.push(res)
       end
 
-      return @last_roll
+      return @result
     end
 
     # Gets the total of the last roll; if there is no 
     # last roll, it calls roll() first.
     def total
-      self.roll() if @last_roll.empty?
-      return @last_roll.inject(0) {|t, r| t += r.total()}
+      self.roll() if @result.empty?
+      return @result.inject(0) {|t, r| t += r.total()}
     end
 
     # Returns the result from the last roll, or if the dice
     # have not been rolled, rolls first.
     def result
-      self.roll() if @last_roll.empty?
-      return @last_roll
+      self.roll() if @result.empty?
+      return @result
     end
 
     # The following methods ignore any :times and :explode 
@@ -309,16 +343,22 @@ module Dice
     attr :parsed
 
     def initialize(dstr="")
-      @parsed = parse_dice_string(dstr)
+      @parsed = Dice.parse_dice_string(dstr)
+      @result = []
+    end
+
+    def result
+      self.roll() if @result.empty?
+      return @result
     end
 
     def roll
-      all = []
+      @result = []
 
       @parsed.each do |section|
-        total = 0
-        parts = []
-        label = ""
+        total    = 0
+        sections = []
+        label    = ""
 
         section.each do |op, part|
           
@@ -331,29 +371,33 @@ module Dice
             label = part.value()
           when :start
             total = part.total()
-            parts.push(part)
+            sections.push(part)
           when :add
             total += part.total()
-            parts.push(part)
+            sections.push(part)
           when :sub
             total -= part.total()
-            parts.push(part)
+            sections.push(part)
           end
         end
 
-        all.push(ComplexResult.new(total, parts, label))
+        @result.push(ComplexResult.new(total, sections, label))
       end
 
-      return all
+      return @result
     end
 
     # Recreates the complex dice string from the 
     # parsed array.
     def to_s
-      return make_dice_string(@parsed)
+      return Dice.make_dice_string(@parsed)
     end
 
   end
+
+  ##################
+  # Module Methods #
+  ##################
 
   # Parses a complex dice string made up of one or more
   # comma-separated parts, each with an optional label.
@@ -380,7 +424,7 @@ module Dice
   # Each part (the 2nd element in each sub-array) is a 
   # subclass of SimplePart: LabelPart, StaticPart, or
   # RollPart.
-  def parse_dice_string(dstr="")
+  def Dice.parse_dice_string(dstr="")
     all = []
 
     # Get our sections.
@@ -424,10 +468,17 @@ module Dice
     return all
   end
 
+  # Takes a nested array, such as that returned from
+  # parse_dice_string() and recreates the dice string.
+  def Dice.make_dice_string(arr=[])
+    return "" if arr.empty? or not arr.is_a?(Array)
+    return arr.collect {|part| make_substring(part)}.join(", ")
+  end
+
   # Examines the given string and determines with
   # subclass of SimplePart the part should be. If it
   # can't figure it out, it defaults to SimplePart.
-  def get_part(dstr="")
+  def Dice.get_part(dstr="")
     part = case dstr
     when /^\d+$/
       StaticPart.new(dstr)
@@ -439,16 +490,9 @@ module Dice
     return part
   end
 
-  # Takes a nested array, such as that returned from
-  # parse_dice_string() and recreates the dice string.
-  def make_dice_string(arr=[])
-    return "" if arr.empty? or not arr.is_a?(Array)
-    return arr.collect {|part| make_substring(part)}.join(", ")
-  end
-
   # Builds the individual section by calling
   # each part's to_s() method. Returns a string.
-  def make_substring(arr=[])
+  def Dice.make_substring(arr=[])
     s = ""
     return s if arr.empty? or not arr.is_a?(Array)
 

@@ -1,0 +1,15 @@
+Changes for Version 2.1
+=======================
+
+* Moved the RollResult and ComplexResult structures into their own classes.
+  This allows for more methods to be added to them dynamically, in an 
+  easier way.
+
+* The Dice::Roll class now remembers the last roll, which can be obtained
+  via the result() method. If the instance has yet to to do a roll, then
+  roll() is called first.
+
+* Cleaned up code in the RollPart#parse() method, removing some legacy
+  variables that no longer apply to the 2.* version of the library.
+
+* Added this ChangeLog! :D

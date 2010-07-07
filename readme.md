@@ -84,11 +84,9 @@ Using the library is rather straight forward:
 
     require 'dicelib'
 
-    include Dice
+    dice = Dice::Roll.new("(Damage) 2d8 + 5 + 1d6")
 
-    dice = Roll.new("(Damage) 2d8 + 5 + 1d6")
-
-    results = dice.roll()
+    results = dice.result()
 
     results.each do |result|
       puts "%10s: %s" % [result.label, result.total]
@@ -101,8 +99,8 @@ This would output something like the following:
 It is possible to get the individual sections values as well:
 
     results.each do |result|
-      result.parts.each do |part|
-        puts "%-4s: %s" % [part.to_s(), part.result()]
+      result.sections.each do |section|
+        puts "%-4s: %s" % [section.to_s(), section.result()]
       end
     end
 
@@ -132,3 +130,20 @@ For the above given dice string, this returns a nested array of values:
 ...note, however, that each sections 2nd element is actually a class 
 instance of SimplePart or one of it's subclasses. I used strings above
 to simply show the format.
+
+Typically, you won't have to deal with the internals of a dice roll if all
+you want are the results. However, you can dig down into the returned
+result's classes to obtain pretty much any data you want.
+
+For example, if you wanted to know the actual dice tally of a '4d6 !3' roll,
+you could do this, after getting the result from Dice::Roll.result():
+
+  result = Dice::Roll.new("4d6 !3").result()
+
+  tally = result[0].sections[0].result[0].tally()
+
+  puts "[%s]" % tally.join("][")
+
+Most of the classes have to_s() methods that'll work for most cases.
+
+
