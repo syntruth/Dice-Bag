@@ -1,6 +1,9 @@
 Changes for Version 2.1
 =======================
 
+* Added a parsed() method to ComplexResult, that holds that part of the
+  complex strings parsed data.
+
 * Moved the RollResult and ComplexResult structures into their own classes.
   This allows for more methods to be added to them dynamically, in an 
   easier way.

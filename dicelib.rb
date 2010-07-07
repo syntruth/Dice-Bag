@@ -63,11 +63,13 @@ module Dice
     attr :total
     attr :sections
     attr :label
+    attr :parsed
 
-    def initialize(total=0, sections=[], label="")
+    def initialize(total=0, sections=[], label="", parsed=[])
       @total    = total
       @sections = sections
       @label    = label
+      @parsed   = parsed
     end
 
     def to_s
@@ -381,7 +383,9 @@ module Dice
           end
         end
 
-        @result.push(ComplexResult.new(total, sections, label))
+        res = ComplexResult.new(total, sections, label, section)
+
+        @result.push(res)
       end
 
       return @result
