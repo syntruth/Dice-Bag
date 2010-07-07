@@ -104,10 +104,10 @@ module Dice
         :times   => 1,
         :num     => 1,
         :sides   => 6,
-        :mult    => 0,
         :keep    => 0,
         :explode => 0,
-        :reroll  => 0
+        :reroll  => 0,
+        :mult    => 0,
       }
 
       self.parse()
@@ -145,9 +145,9 @@ module Dice
         @parts[:num]     = parts[1] if parts[1] > 1
         @parts[:sides]   = parts[2] if parts[2] > 1
         @parts[:explode] = parts[3] if parts[3] > 1
-        @parts[:mult]    = parts[4] if parts[4] > 1
-        @parts[:keep]    = parts[5] if parts[5] > 0
-        @parts[:reroll]  = parts[6] if parts[6] > 0
+        @parts[:keep]    = parts[4] if parts[4] > 0
+        @parts[:reroll]  = parts[5] if parts[5] > 0
+        @parts[:mult]    = parts[6] if parts[6] > 1
       end
 
       return self
