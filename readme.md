@@ -138,11 +138,11 @@ result's classes to obtain pretty much any data you want.
 For example, if you wanted to know the actual dice tally of a '4d6 !3' roll,
 you could do this, after getting the result from Dice::Roll.result():
 
-  result = Dice::Roll.new("4d6 !3").result()
+    result = Dice::Roll.new("4d6 !3").result()
 
-  tally = result[0].sections[0].result[0].tally()
+    tally = result[0].sections[0].result[0].tally()
 
-  puts "[%s]" % tally.join("][")
+    puts "[%s]" % tally.join("][")
 
 Most of the classes have to_s() methods that'll work for most cases.
 
