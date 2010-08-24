@@ -1,6 +1,6 @@
 # Name   : Dice Library for Ruby
 # Author : Randy Carnahan
-# Version: 2.5
+# Version: 2.5.1
 # License: LGPL
 
 module Dice
@@ -105,11 +105,9 @@ module Dice
   # to get the roll result.
   class RollPart < SimplePart
 
-    attr :total
     attr :parts
 
     def initialize(dstr)
-      @result = []
       @total  = nil
       @tally  = []
       @value  = dstr
@@ -169,7 +167,7 @@ module Dice
     # Checks to see if this instance has rolled yet
     # or not.
     def has_rolled?
-      return @result.empty? ? false : true
+      return @total.nil? ? false : true
     end
 
     # Rolls a single die from the xDx string.

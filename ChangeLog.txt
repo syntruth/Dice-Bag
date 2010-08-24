@@ -1,3 +1,11 @@
+Changes for Version 2.5.1
+=========================
+* Removed attr :total from RollPart, since there is a method for
+  that currently that'll call roll() if the part has not yet
+  rolled.
+
+* Fixed bug in RollPart, where a @result reference was not removed.
+
 Changes for Version 2.5
 =======================
 * Modified standard_dice.rb dice to now use the SimpleRoll class.
@@ -14,7 +22,6 @@ Changes for Version 2.5
 
 Changes for Version 2.1
 =======================
-
 * Added <=>() to the RollResult class to handle sorting of results based
   on the total.
 
