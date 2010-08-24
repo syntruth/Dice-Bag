@@ -65,8 +65,8 @@
         <tr class="top-aligned-row">
             <td><strong>Parent:</strong></td>
             <td>
-                <a href="Roll.html">
-                Roll
+                <a href="SimpleRoll.html">
+                SimpleRoll
                </a>
             </td>
         </tr>
@@ -154,8 +154,7 @@
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">roll</span>(<span class="ruby-identifier">modifier</span>=<span class="ruby-value">0</span>)
       <span class="ruby-identifier">modifier</span> = <span class="ruby-value">0</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">modifier</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Fixnum</span>)
 
-      <span class="ruby-identifier">res</span> = <span class="ruby-keyword kw">super</span>()
-      <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">res</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">total</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">modifier</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">super</span>.<span class="ruby-identifier">total</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">modifier</span>
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>

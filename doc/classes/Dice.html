@@ -79,7 +79,7 @@
     <div id="description">
       <p>
 Name : <a href="Dice.html">Dice</a> Library for Ruby Author : Randy
-Carnahan Version: 2.1 License: LGPL
+Carnahan Version: 2.5.1 License: LGPL
 </p>
 
     </div>
@@ -91,8 +91,8 @@ Carnahan Version: 2.1 License: LGPL
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000003">get_part</a>&nbsp;&nbsp;
-      <a href="#M000002">make_dice_string</a>&nbsp;&nbsp;
+      <a href="#M000002">get_part</a>&nbsp;&nbsp;
+      <a href="#M000003">make_dice_string</a>&nbsp;&nbsp;
       <a href="#M000004">make_substring</a>&nbsp;&nbsp;
       <a href="#M000001">parse_dice_string</a>&nbsp;&nbsp;
       </div>
@@ -120,8 +120,8 @@ Class <a href="Dice/Die.html" class="link">Dice::Die</a><br />
 Class <a href="Dice/LabelPart.html" class="link">Dice::LabelPart</a><br />
 Class <a href="Dice/Roll.html" class="link">Dice::Roll</a><br />
 Class <a href="Dice/RollPart.html" class="link">Dice::RollPart</a><br />
-Class <a href="Dice/RollResult.html" class="link">Dice::RollResult</a><br />
 Class <a href="Dice/SimplePart.html" class="link">Dice::SimplePart</a><br />
+Class <a href="Dice/SimpleRoll.html" class="link">Dice::SimpleRoll</a><br />
 Class <a href="Dice/StaticPart.html" class="link">Dice::StaticPart</a><br />
 
     </div>
@@ -144,7 +144,7 @@ Test Strings ###
         <tr class="top-aligned-row context-row">
           <td class="context-item-name">TEST_SIMPLE</td>
           <td>=</td>
-          <td class="context-item-value">&quot;6x 4d6 !3&quot;</td>
+          <td class="context-item-value">&quot;4d6 !3&quot;</td>
         </tr>
         <tr class="top-aligned-row context-row">
           <td class="context-item-name">EXPLODE_LIMIT</td>
@@ -169,7 +169,7 @@ Regular Expressions #
         <tr class="top-aligned-row context-row">
           <td class="context-item-name">ROLL_REGEX</td>
           <td>=</td>
-          <td class="context-item-value">/(\d{1,2}x)?    # How many times?     (\d{1,2})?d(\d{1,3}|\%)    # The dice to roll, xDx format     (e\d{0,2})?                # Explode value     (!\d{1,2})?                # Keep value     (r\d{1,2})?                # Reroll value     (\*\d{1,2})?               # Multiplier   /xi</td>
+          <td class="context-item-value">/     (\d{1,2})?d(\d{1,3}|\%)    # The dice to roll, xDx format     (e\d{0,2})?                # Explode value     (!\d{1,2})?                # Keep value     (r\d{1,2})?                # Reroll value     (\*\d{1,2})?               # Multiplier   /xi</td>
         </tr>
         </table>
       </div>
@@ -184,11 +184,11 @@ Regular Expressions #
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000003" class="method-detail">
-        <a name="M000003"></a>
+      <div id="method-M000002" class="method-detail">
+        <a name="M000002"></a>
 
         <div class="method-heading">
-          <a href="#M000003" class="method-signature">
+          <a href="#M000002" class="method-signature">
           <span class="method-name">get_part</span><span class="method-args">(dstr=&quot;&quot;)</span>
           </a>
         </div>
@@ -201,10 +201,10 @@ can&#8216;t figure it out, it defaults to <a
 href="Dice/SimplePart.html">SimplePart</a>.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000003-source">
+            onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000002-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 481</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 467</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Dice</span>.<span class="ruby-identifier">get_part</span>(<span class="ruby-identifier">dstr</span>=<span class="ruby-value str">&quot;&quot;</span>)
     <span class="ruby-identifier">part</span> = <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">dstr</span>
     <span class="ruby-keyword kw">when</span> <span class="ruby-regexp re">/^\d+$/</span>
@@ -221,11 +221,11 @@ href="Dice/SimplePart.html">SimplePart</a>.
         </div>
       </div>
 
-      <div id="method-M000002" class="method-detail">
-        <a name="M000002"></a>
+      <div id="method-M000003" class="method-detail">
+        <a name="M000003"></a>
 
         <div class="method-heading">
-          <a href="#M000002" class="method-signature">
+          <a href="#M000003" class="method-signature">
           <span class="method-name">make_dice_string</span><span class="method-args">(arr=[])</span>
           </a>
         </div>
@@ -237,12 +237,12 @@ href="Dice.html#M000001">parse_dice_string</a>() and recreates the dice
 string.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000002-source">
+            onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000003-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 473</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 481</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Dice</span>.<span class="ruby-identifier">make_dice_string</span>(<span class="ruby-identifier">arr</span>=[])
-    <span class="ruby-keyword kw">return</span> <span class="ruby-value str">&quot;&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+    <span class="ruby-keyword kw">return</span> <span class="ruby-value str">&quot;&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">empty?</span>
     <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">collect</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">part</span><span class="ruby-operator">|</span> <span class="ruby-identifier">make_substring</span>(<span class="ruby-identifier">part</span>)}.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;, &quot;</span>)
   <span class="ruby-keyword kw">end</span>
 </pre>
@@ -268,10 +268,10 @@ Returns a string.
             onclick="toggleCode('M000004-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000004-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 495</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 488</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Dice</span>.<span class="ruby-identifier">make_substring</span>(<span class="ruby-identifier">arr</span>=[])
     <span class="ruby-identifier">s</span> = <span class="ruby-value str">&quot;&quot;</span>
-    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">or</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)
+    <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">empty?</span>
 
     <span class="ruby-identifier">arr</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">op</span>, <span class="ruby-identifier">part</span><span class="ruby-operator">|</span>
       <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">op</span>
@@ -341,7 +341,7 @@ href="Dice/RollPart.html">RollPart</a>.
             onclick="toggleCode('M000001-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000001-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 427</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 420</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-constant">Dice</span>.<span class="ruby-identifier">parse_dice_string</span>(<span class="ruby-identifier">dstr</span>=<span class="ruby-value str">&quot;&quot;</span>)
     <span class="ruby-identifier">all</span> = []
 

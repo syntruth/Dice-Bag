@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Dice::SimpleRoll</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Dice::SimpleRoll</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/dicelib_rb.html">
+                dicelib.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="Roll.html">
+                Roll
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+This is a simplified subclass of <a href="Roll.html">Roll</a>, for handling
+simple dice strings, like a single die <a
+href="SimpleRoll.html#M000020">roll</a>. This operates just like the <a
+href="Roll.html">Roll</a> class, except that it has some methods to more
+easily pull totals and a <a href="SimpleRoll.html#M000021">tally</a> for
+the <a href="SimpleRoll.html#M000020">roll</a>. This is for -simple- dice
+rolls only, no static parts or labels. Any extra parts are ignored. For
+example:
+</p>
+<pre>
+  SimpleRoll.new(&quot;1d20&quot;)
+       -- or --
+  SimpleRoll.new(&quot;1d6e&quot;)
+</pre>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000020">roll</a>&nbsp;&nbsp;
+      <a href="#M000021">tally</a>&nbsp;&nbsp;
+      <a href="#M000022">total</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
+
+        <div class="method-heading">
+          <a href="#M000020" class="method-signature">
+          <span class="method-name">roll</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Overrides the <a href="Roll.html#M000026">Roll#roll</a>() method. Instead
+of returning the result array, it instead calls the super&#8216;s method
+and then returns self.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000020-source">
+<pre>
+<span class="ruby-comment cmt"># File dicelib.rb, line 375</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">roll</span>
+      <span class="ruby-keyword kw">super</span>()
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
+
+        <div class="method-heading">
+          <a href="#M000021" class="method-signature">
+          <span class="method-name">tally</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000021-source">
+<pre>
+<span class="ruby-comment cmt"># File dicelib.rb, line 380</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">tally</span>
+      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">roll</span>() <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">empty?</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">sections</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">tally</span>()
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
+
+        <div class="method-heading">
+          <a href="#M000022" class="method-signature">
+          <span class="method-name">total</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000022-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000022-source">
+<pre>
+<span class="ruby-comment cmt"># File dicelib.rb, line 385</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">total</span>
+      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">roll</span>() <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">empty?</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">total</span> 
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

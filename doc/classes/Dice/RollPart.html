@@ -84,8 +84,7 @@
       <p>
 This represents the xDx part of the dice string. It takes the xDx part of
 the dice string and parses it to get the individual parts. It also provides
-methods for to get the <a href="RollPart.html#M000030">roll</a> <a
-href="RollPart.html#M000032">result</a>.
+methods for to get the <a href="RollPart.html#M000033">roll</a> result.
 </p>
 
     </div>
@@ -97,17 +96,18 @@ href="RollPart.html#M000032">result</a>.
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000035">average</a>&nbsp;&nbsp;
-      <a href="#M000028">has_rolled?</a>&nbsp;&nbsp;
-      <a href="#M000033">maximum</a>&nbsp;&nbsp;
-      <a href="#M000034">minimum</a>&nbsp;&nbsp;
-      <a href="#M000026">new</a>&nbsp;&nbsp;
-      <a href="#M000027">parse</a>&nbsp;&nbsp;
-      <a href="#M000032">result</a>&nbsp;&nbsp;
-      <a href="#M000030">roll</a>&nbsp;&nbsp;
-      <a href="#M000029">roll_die</a>&nbsp;&nbsp;
-      <a href="#M000036">to_s</a>&nbsp;&nbsp;
-      <a href="#M000031">total</a>&nbsp;&nbsp;
+      <a href="#M000040">&lt;=&gt;</a>&nbsp;&nbsp;
+      <a href="#M000038">average</a>&nbsp;&nbsp;
+      <a href="#M000031">has_rolled?</a>&nbsp;&nbsp;
+      <a href="#M000036">maximum</a>&nbsp;&nbsp;
+      <a href="#M000037">minimum</a>&nbsp;&nbsp;
+      <a href="#M000029">new</a>&nbsp;&nbsp;
+      <a href="#M000030">parse</a>&nbsp;&nbsp;
+      <a href="#M000033">roll</a>&nbsp;&nbsp;
+      <a href="#M000032">roll_die</a>&nbsp;&nbsp;
+      <a href="#M000034">tally</a>&nbsp;&nbsp;
+      <a href="#M000039">to_s</a>&nbsp;&nbsp;
+      <a href="#M000035">total</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -142,24 +142,25 @@ href="RollPart.html#M000032">result</a>.
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000026" class="method-detail">
-        <a name="M000026"></a>
+      <div id="method-M000029" class="method-detail">
+        <a name="M000029"></a>
 
         <div class="method-heading">
-          <a href="#M000026" class="method-signature">
+          <a href="#M000029" class="method-signature">
           <span class="method-name">new</span><span class="method-args">(dstr)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000026-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000026-source">
+            onclick="toggleCode('M000029-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000029-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 134</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 110</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">dstr</span>)
-      <span class="ruby-ivar">@result</span> = []
-      <span class="ruby-ivar">@value</span> = <span class="ruby-identifier">dstr</span>
+      <span class="ruby-ivar">@total</span>  = <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-ivar">@tally</span>  = []
+      <span class="ruby-ivar">@value</span>  = <span class="ruby-identifier">dstr</span>
 
       <span class="ruby-comment cmt"># Our Default Values</span>
       <span class="ruby-ivar">@parts</span> = {
@@ -181,21 +182,44 @@ href="RollPart.html#M000032">result</a>.
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000035" class="method-detail">
-        <a name="M000035"></a>
+      <div id="method-M000040" class="method-detail">
+        <a name="M000040"></a>
 
         <div class="method-heading">
-          <a href="#M000035" class="method-signature">
+          <a href="#M000040" class="method-signature">
+          <span class="method-name">&lt;=&gt;</span><span class="method-args">(other)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000040-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000040-source">
+<pre>
+<span class="ruby-comment cmt"># File dicelib.rb, line 289</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-operator">&lt;=&gt;</span>(<span class="ruby-identifier">other</span>)
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">total</span> <span class="ruby-operator">&lt;=&gt;</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">total</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000038" class="method-detail">
+        <a name="M000038"></a>
+
+        <div class="method-heading">
+          <a href="#M000038" class="method-signature">
           <span class="method-name">average</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000035-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000035-source">
+            onclick="toggleCode('M000038-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000038-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 295</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 260</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">average</span>()
       <span class="ruby-comment cmt"># Returns a float, of course.</span>
       <span class="ruby-keyword kw">return</span> (<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">maximum</span>() <span class="ruby-operator">+</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">minimum</span>()) <span class="ruby-operator">/</span> <span class="ruby-value">2.0</span>
@@ -205,11 +229,11 @@ href="RollPart.html#M000032">result</a>.
         </div>
       </div>
 
-      <div id="method-M000028" class="method-detail">
-        <a name="M000028"></a>
+      <div id="method-M000031" class="method-detail">
+        <a name="M000031"></a>
 
         <div class="method-heading">
-          <a href="#M000028" class="method-signature">
+          <a href="#M000031" class="method-signature">
           <span class="method-name">has_rolled?</span><span class="method-args">()</span>
           </a>
         </div>
@@ -219,23 +243,23 @@ href="RollPart.html#M000032">result</a>.
 Checks to see if this instance has rolled yet or not.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000028-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000028-source">
+            onclick="toggleCode('M000031-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000031-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 194</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 169</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">has_rolled?</span>
-      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-value">? </span><span class="ruby-keyword kw">false</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">true</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@total</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-keyword kw">false</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">true</span>
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
       </div>
 
-      <div id="method-M000033" class="method-detail">
-        <a name="M000033"></a>
+      <div id="method-M000036" class="method-detail">
+        <a name="M000036"></a>
 
         <div class="method-heading">
-          <a href="#M000033" class="method-signature">
+          <a href="#M000036" class="method-signature">
           <span class="method-name">maximum</span><span class="method-args">()</span>
           </a>
         </div>
@@ -246,10 +270,10 @@ The following methods ignore any :times and :explode values, so these
 won&#8216;t be overly helpful in figuring out statistics or anything.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000033-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000033-source">
+            onclick="toggleCode('M000036-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000036-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 274</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 239</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">maximum</span>()
       <span class="ruby-identifier">num</span> = <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>].<span class="ruby-identifier">zero?</span> <span class="ruby-value">? </span><span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:num</span>] <span class="ruby-operator">:</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>]
       <span class="ruby-identifier">mult</span> = <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>].<span class="ruby-identifier">zero?</span> <span class="ruby-value">? </span><span class="ruby-value">1</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>]
@@ -260,21 +284,21 @@ won&#8216;t be overly helpful in figuring out statistics or anything.
         </div>
       </div>
 
-      <div id="method-M000034" class="method-detail">
-        <a name="M000034"></a>
+      <div id="method-M000037" class="method-detail">
+        <a name="M000037"></a>
 
         <div class="method-heading">
-          <a href="#M000034" class="method-signature">
+          <a href="#M000037" class="method-signature">
           <span class="method-name">minimum</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000034-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000034-source">
+            onclick="toggleCode('M000037-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000037-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 280</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 245</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">minimum</span>()
       <span class="ruby-comment cmt"># Short-circuit-ish logic here; if :sides and :reroll</span>
       <span class="ruby-comment cmt"># are the same, return maximum() instead.</span>
@@ -294,25 +318,25 @@ won&#8216;t be overly helpful in figuring out statistics or anything.
         </div>
       </div>
 
-      <div id="method-M000027" class="method-detail">
-        <a name="M000027"></a>
+      <div id="method-M000030" class="method-detail">
+        <a name="M000030"></a>
 
         <div class="method-heading">
-          <a href="#M000027" class="method-signature">
+          <a href="#M000030" class="method-signature">
           <span class="method-name">parse</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-Uses the ROLL_REGEX constant to <a href="RollPart.html#M000027">parse</a>
+Uses the ROLL_REGEX constant to <a href="RollPart.html#M000030">parse</a>
 the xDx string into the individual parts.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000027-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000027-source">
+            onclick="toggleCode('M000030-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000030-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 154</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 131</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse</span>()
 
       <span class="ruby-identifier">dstr</span> = <span class="ruby-ivar">@value</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/\s+/</span>, <span class="ruby-value str">&quot;&quot;</span>)
@@ -334,19 +358,74 @@ the xDx string into the individual parts.
           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">nil?</span>
             <span class="ruby-identifier">i</span> = <span class="ruby-value">0</span>
           <span class="ruby-keyword kw">else</span>
-            <span class="ruby-identifier">i</span> = <span class="ruby-identifier">i</span>[<span class="ruby-value">1</span> <span class="ruby-operator">..</span> <span class="ruby-value">-1</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">match</span>(<span class="ruby-regexp re">/^[!*er]/</span>)
-            <span class="ruby-identifier">i</span>.<span class="ruby-identifier">to_i</span>
+            <span class="ruby-identifier">i</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/^[!*er]/</span>, <span class="ruby-value str">&quot;&quot;</span>).<span class="ruby-identifier">to_i</span>()
           <span class="ruby-keyword kw">end</span>
         <span class="ruby-keyword kw">end</span>
         
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:times</span>]   = <span class="ruby-identifier">parts</span>[<span class="ruby-value">0</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:num</span>]     = <span class="ruby-identifier">parts</span>[<span class="ruby-value">1</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">1</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:sides</span>]   = <span class="ruby-identifier">parts</span>[<span class="ruby-value">2</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">2</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>] = <span class="ruby-identifier">parts</span>[<span class="ruby-value">3</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">3</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>]    = <span class="ruby-identifier">parts</span>[<span class="ruby-value">4</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">4</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:reroll</span>]  = <span class="ruby-identifier">parts</span>[<span class="ruby-value">5</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">5</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>]    = <span class="ruby-identifier">parts</span>[<span class="ruby-value">6</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">6</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:num</span>]     = <span class="ruby-identifier">parts</span>[<span class="ruby-value">0</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:sides</span>]   = <span class="ruby-identifier">parts</span>[<span class="ruby-value">1</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">1</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>] = <span class="ruby-identifier">parts</span>[<span class="ruby-value">2</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">2</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
+        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>]    = <span class="ruby-identifier">parts</span>[<span class="ruby-value">3</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">3</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:reroll</span>]  = <span class="ruby-identifier">parts</span>[<span class="ruby-value">4</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">4</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>]    = <span class="ruby-identifier">parts</span>[<span class="ruby-value">5</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">parts</span>[<span class="ruby-value">5</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
       <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000033" class="method-detail">
+        <a name="M000033"></a>
+
+        <div class="method-heading">
+          <a href="#M000033" class="method-signature">
+          <span class="method-name">roll</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Rolls the dice, saving the results in the @result instance variable.
+@result is cleared before the <a href="RollPart.html#M000033">roll</a> is
+handled.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000033-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000033-source">
+<pre>
+<span class="ruby-comment cmt"># File dicelib.rb, line 188</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">roll</span>
+      <span class="ruby-identifier">results</span> = []
+
+      <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:num</span>].<span class="ruby-identifier">times</span> <span class="ruby-keyword kw">do</span>
+        <span class="ruby-identifier">roll</span> = <span class="ruby-identifier">roll_die</span>()
+
+        <span class="ruby-identifier">results</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">roll</span>)
+
+        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+          <span class="ruby-identifier">explode_limit</span> = <span class="ruby-value">0</span>
+
+          <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">roll</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>]
+            <span class="ruby-identifier">roll</span> = <span class="ruby-identifier">roll_die</span>()
+            <span class="ruby-identifier">results</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">roll</span>)
+            <span class="ruby-identifier">explode_limit</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+            <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">explode_limit</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-constant">EXPLODE_LIMIT</span>
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-ivar">@tally</span> = <span class="ruby-identifier">results</span>.<span class="ruby-identifier">dup</span>()
+      <span class="ruby-identifier">results</span>.<span class="ruby-identifier">sort!</span>.<span class="ruby-identifier">reverse!</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
+        <span class="ruby-identifier">results</span> = <span class="ruby-identifier">results</span>[<span class="ruby-value">0</span> <span class="ruby-operator">...</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>]]
+      <span class="ruby-keyword kw">end</span>
+       
+      <span class="ruby-ivar">@total</span> = <span class="ruby-identifier">results</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">t</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">i</span>}
+      <span class="ruby-ivar">@total</span> = <span class="ruby-identifier">total</span> <span class="ruby-operator">*</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
 
       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">self</span>
     <span class="ruby-keyword kw">end</span>
@@ -360,103 +439,6 @@ the xDx string into the individual parts.
 
         <div class="method-heading">
           <a href="#M000032" class="method-signature">
-          <span class="method-name">result</span><span class="method-args">()</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-Returns the <a href="RollPart.html#M000032">result</a> from the last <a
-href="RollPart.html#M000030">roll</a>, or if the dice have not been rolled,
-rolls first.
-</p>
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000032-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000032-source">
-<pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 265</span>
-    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">result</span>
-      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">roll</span>() <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">empty?</span>
-      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@result</span>
-    <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
-      <div id="method-M000030" class="method-detail">
-        <a name="M000030"></a>
-
-        <div class="method-heading">
-          <a href="#M000030" class="method-signature">
-          <span class="method-name">roll</span><span class="method-args">()</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-Rolls the dice, saving the results in the @<a
-href="RollPart.html#M000032">result</a> instance variable. @<a
-href="RollPart.html#M000032">result</a> is cleared before the <a
-href="RollPart.html#M000030">roll</a> is handled.
-</p>
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000030-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000030-source">
-<pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 213</span>
-    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">roll</span>
-      <span class="ruby-ivar">@result</span> = []
-
-      <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:times</span>].<span class="ruby-identifier">times</span> <span class="ruby-keyword kw">do</span>
-
-        <span class="ruby-identifier">results</span> = []
-        <span class="ruby-identifier">total</span> = <span class="ruby-value">0</span>
-
-        <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:num</span>].<span class="ruby-identifier">times</span> <span class="ruby-keyword kw">do</span>
-          <span class="ruby-identifier">roll</span> = <span class="ruby-identifier">roll_die</span>()
-
-          <span class="ruby-identifier">results</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">roll</span>)
-
-          <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>] <span class="ruby-keyword kw">and</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
-            <span class="ruby-identifier">explode_limit</span> = <span class="ruby-value">0</span>
-
-            <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">roll</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>]
-              <span class="ruby-identifier">roll</span> = <span class="ruby-identifier">roll_die</span>()
-              <span class="ruby-identifier">results</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">roll</span>)
-              <span class="ruby-identifier">explode_limit</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
-              <span class="ruby-keyword kw">break</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">explode_limit</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-constant">EXPLODE_LIMIT</span>
-            <span class="ruby-keyword kw">end</span>
-          <span class="ruby-keyword kw">end</span>
-        <span class="ruby-keyword kw">end</span>
-
-        <span class="ruby-identifier">tally</span> = <span class="ruby-identifier">results</span>.<span class="ruby-identifier">dup</span>()
-        <span class="ruby-identifier">results</span>.<span class="ruby-identifier">sort!</span>.<span class="ruby-identifier">reverse!</span>
-
-        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>
-          <span class="ruby-identifier">results</span> = <span class="ruby-identifier">results</span>[<span class="ruby-value">0</span> <span class="ruby-operator">...</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>]]
-        <span class="ruby-keyword kw">end</span>
-         
-        <span class="ruby-identifier">total</span> = <span class="ruby-identifier">results</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">t</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">i</span>}
-        <span class="ruby-identifier">total</span> = <span class="ruby-identifier">total</span> <span class="ruby-operator">*</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
-
-        <span class="ruby-identifier">res</span> = <span class="ruby-constant">RollResult</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">total</span>, <span class="ruby-identifier">tally</span>)
-
-        <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">res</span>)
-      <span class="ruby-keyword kw">end</span>
-
-      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@result</span>
-    <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
-      <div id="method-M000029" class="method-detail">
-        <a name="M000029"></a>
-
-        <div class="method-heading">
-          <a href="#M000029" class="method-signature">
           <span class="method-name">roll_die</span><span class="method-args">()</span>
           </a>
         </div>
@@ -466,10 +448,10 @@ href="RollPart.html#M000030">roll</a> is handled.
 Rolls a single die from the xDx string.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000029-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000029-source">
+            onclick="toggleCode('M000032-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000032-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 199</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 174</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">roll_die</span>()
       <span class="ruby-identifier">num</span> = <span class="ruby-value">0</span>
       <span class="ruby-identifier">reroll</span> = (<span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:reroll</span>] <span class="ruby-operator">&gt;=</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:sides</span>]) <span class="ruby-operator">?</span> <span class="ruby-value">0</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:reroll</span>]
@@ -485,11 +467,40 @@ Rolls a single die from the xDx string.
         </div>
       </div>
 
-      <div id="method-M000036" class="method-detail">
-        <a name="M000036"></a>
+      <div id="method-M000034" class="method-detail">
+        <a name="M000034"></a>
 
         <div class="method-heading">
-          <a href="#M000036" class="method-signature">
+          <a href="#M000034" class="method-signature">
+          <span class="method-name">tally</span><span class="method-args">(do_sort=true)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns the <a href="RollPart.html#M000034">tally</a> from the <a
+href="RollPart.html#M000033">roll</a>. This is the entire <a
+href="RollPart.html#M000034">tally</a>, even if a :keep option was given.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000034-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000034-source">
+<pre>
+<span class="ruby-comment cmt"># File dicelib.rb, line 223</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">tally</span>(<span class="ruby-identifier">do_sort</span>=<span class="ruby-keyword kw">true</span>)
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@tally</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">reverse</span>() <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">do_sort</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@tally</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000039" class="method-detail">
+        <a name="M000039"></a>
+
+        <div class="method-heading">
+          <a href="#M000039" class="method-signature">
           <span class="method-name">to_s</span><span class="method-args">(no_spaces=false)</span>
           </a>
         </div>
@@ -500,20 +511,15 @@ This takes the @parts hash and recreates the xDx string. Optionally,
 passing true to the method will remove spaces form the finished string.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000036-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000036-source">
+            onclick="toggleCode('M000039-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000039-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 303</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 268</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">to_s</span>(<span class="ruby-identifier">no_spaces</span>=<span class="ruby-keyword kw">false</span>)
       <span class="ruby-identifier">s</span> = <span class="ruby-value str">&quot;&quot;</span>
 
       <span class="ruby-identifier">sp</span> = <span class="ruby-identifier">no_spaces</span> <span class="ruby-value">? </span><span class="ruby-value str">&quot;&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot; &quot;</span>
       
-      <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-keyword kw">case</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:times</span>]
-        <span class="ruby-keyword kw">when</span> <span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">1</span> <span class="ruby-keyword kw">then</span> <span class="ruby-value str">&quot;&quot;</span>
-        <span class="ruby-keyword kw">else</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:times</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span> <span class="ruby-node">&quot;x#{sp}&quot;</span>
-      <span class="ruby-keyword kw">end</span>
-
       <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:num</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:num</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>
       <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-value str">&quot;d&quot;</span>
       <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:sides</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:sides</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>
@@ -523,13 +529,8 @@ passing true to the method will remove spaces form the finished string.
         <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:explode</span>] <span class="ruby-operator">!=</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:sides</span>]
       <span class="ruby-keyword kw">end</span>
 
-      <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-keyword kw">case</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>]
-        <span class="ruby-keyword kw">when</span> <span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">1</span> <span class="ruby-keyword kw">then</span> <span class="ruby-value str">&quot;&quot;</span>
-        <span class="ruby-keyword kw">else</span> <span class="ruby-node">&quot;#{sp}*&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>].<span class="ruby-identifier">to_s</span>
-      <span class="ruby-keyword kw">end</span>
-
+      <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-node">&quot;#{sp}*&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:mult</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>
       <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-node">&quot;#{sp}!&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:keep</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>
-
       <span class="ruby-identifier">s</span> <span class="ruby-operator">+=</span> <span class="ruby-node">&quot;#{sp}r&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:reroll</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@parts</span>[<span class="ruby-identifier">:reroll</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>
 
       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">s</span>
@@ -539,30 +540,30 @@ passing true to the method will remove spaces form the finished string.
         </div>
       </div>
 
-      <div id="method-M000031" class="method-detail">
-        <a name="M000031"></a>
+      <div id="method-M000035" class="method-detail">
+        <a name="M000035"></a>
 
         <div class="method-heading">
-          <a href="#M000031" class="method-signature">
+          <a href="#M000035" class="method-signature">
           <span class="method-name">total</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-Gets the <a href="RollPart.html#M000031">total</a> of the last <a
-href="RollPart.html#M000030">roll</a>; if there is no last <a
-href="RollPart.html#M000030">roll</a>, it calls <a
-href="RollPart.html#M000030">roll</a>() first.
+Gets the <a href="RollPart.html#M000035">total</a> of the last <a
+href="RollPart.html#M000033">roll</a>; if there is no last <a
+href="RollPart.html#M000033">roll</a>, it calls <a
+href="RollPart.html#M000033">roll</a>() first.
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000031-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000031-source">
+            onclick="toggleCode('M000035-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000035-source">
 <pre>
-<span class="ruby-comment cmt"># File dicelib.rb, line 258</span>
+<span class="ruby-comment cmt"># File dicelib.rb, line 230</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">total</span>
-      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">roll</span>() <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">empty?</span>
-      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@result</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">t</span>, <span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">total</span>()}
+      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">roll</span>() <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@total</span>.<span class="ruby-identifier">nil?</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@total</span>
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
