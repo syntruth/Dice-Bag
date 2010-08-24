@@ -1,6 +1,6 @@
 # Name   : Dice Library for Ruby
 # Author : Randy Carnahan
-# Version: 2.1
+# Version: 2.5
 # License: LGPL
 
 module Dice
@@ -10,7 +10,7 @@ module Dice
   ####################
 
   TEST_COMPLEX = "(Attack) 1d20+8, (Damage) 2d8 + 8 + 1d6 - 3"
-  TEST_SIMPLE  = "6x 4d6 !3"
+  TEST_SIMPLE  = "4d6 !3"
 
   #############
   # Constants #
@@ -24,7 +24,7 @@ module Dice
 
   SECTION_REGEX = /([+-]|[0-9*!xder]+)/i
 
-  ROLL_REGEX = /(\d{1,2}x)?    # How many times?
+  ROLL_REGEX = /
     (\d{1,2})?d(\d{1,3}|\%)    # The dice to roll, xDx format
     (e\d{0,2})?                # Explode value
     (!\d{1,2})?                # Keep value
@@ -35,32 +35,6 @@ module Dice
   ###########
   # Classes #
   ###########
-
-  # This models a single xDx string result.
-  class RollResult
-    attr :total
-
-    def initialize(total=0, tally=[])
-      @total = total
-      @tally = tally
-    end
-
-    def tally(do_sort=true)
-      t = @tally.dup()
-      t.sort!.reverse! if do_sort
-      return t
-    end
-
-    def to_s(do_tally_sort=true)
-      t = "[%s]" % self.tally(do_tally_sort).join("][")
-      return "%s: %s" % [@total, t]
-    end
-
-    def <=>(other)
-      return @total <=> other.total()
-    end
-
-  end
 
   # This models a complex dice string result.
   class ComplexResult
@@ -77,11 +51,7 @@ module Dice
     end
 
     def to_s
-      if @label.empty?
-        return @total.to_s()
-      else
-        return "%s: %s" % [@label, @total]
-      end
+      @label.empty? ? @total.to_s() : "%s: %s" % [@label, @total]
     end
   end
 
@@ -135,11 +105,14 @@ module Dice
   # to get the roll result.
   class RollPart < SimplePart
 
+    attr :total
     attr :parts
 
     def initialize(dstr)
       @result = []
-      @value = dstr
+      @total  = nil
+      @tally  = []
+      @value  = dstr
 
       # Our Default Values
       @parts = {
@@ -178,18 +151,16 @@ module Dice
           if i.nil?
             i = 0
           else
-            i = i[1 .. -1] if i.match(/^[!*er]/)
-            i.to_i
+            i.gsub(/^[!*er]/, "").to_i()
           end
         end
         
-        @parts[:times]   = parts[0] if parts[0] > 0
-        @parts[:num]     = parts[1] if parts[1] > 1
-        @parts[:sides]   = parts[2] if parts[2] > 1
-        @parts[:explode] = parts[3] if parts[3] > 1
-        @parts[:keep]    = parts[4] if parts[4] > 0
-        @parts[:reroll]  = parts[5] if parts[5] > 0
-        @parts[:mult]    = parts[6] if parts[6] > 1
+        @parts[:num]     = parts[0] if parts[0] > 1
+        @parts[:sides]   = parts[1] if parts[1] > 1
+        @parts[:explode] = parts[2] if parts[2] > 1
+        @parts[:keep]    = parts[3] if parts[3] > 0
+        @parts[:reroll]  = parts[4] if parts[4] > 0
+        @parts[:mult]    = parts[5] if parts[5] > 1
       end
 
       return self
@@ -217,60 +188,50 @@ module Dice
     # instance variable. @result is cleared before the 
     # roll is handled.
     def roll
-      @result = []
+      results = []
 
-      @parts[:times].times do
+      @parts[:num].times do
+        roll = roll_die()
 
-        results = []
-        total = 0
+        results.push(roll)
 
-        @parts[:num].times do
-          roll = roll_die()
+        if @parts[:explode] > 0
+          explode_limit = 0
 
-          results.push(roll)
-
-          if @parts[:explode] and @parts[:explode] > 0
-            explode_limit = 0
-
-            while roll >= @parts[:explode]
-              roll = roll_die()
-              results.push(roll)
-              explode_limit += 1
-              break if explode_limit >= EXPLODE_LIMIT
-            end
+          while roll >= @parts[:explode]
+            roll = roll_die()
+            results.push(roll)
+            explode_limit += 1
+            break if explode_limit >= EXPLODE_LIMIT
           end
         end
-
-        tally = results.dup()
-        results.sort!.reverse!
-
-        if @parts[:keep] > 0
-          results = results[0 ... @parts[:keep]]
-        end
-         
-        total = results.inject(0) {|t, i| t += i}
-        total = total * @parts[:mult] if @parts[:mult] > 1
-
-        res = RollResult.new(total, tally)
-
-        @result.push(res)
       end
 
-      return @result
+      @tally = results.dup()
+      results.sort!.reverse!
+
+      if @parts[:keep] > 0
+        results = results[0 ... @parts[:keep]]
+      end
+       
+      @total = results.inject(0) {|t, i| t += i}
+      @total = total * @parts[:mult] if @parts[:mult] > 1
+
+      return self
+    end
+
+    # Returns the tally from the roll. This is the entire
+    # tally, even if a :keep option was given.
+    def tally(do_sort=true)
+      return @tally.dup.sort.reverse() if do_sort
+      return @tally
     end
 
     # Gets the total of the last roll; if there is no 
     # last roll, it calls roll() first.
     def total
-      self.roll() if @result.empty?
-      return @result.inject(0) {|t, r| t += r.total()}
-    end
-
-    # Returns the result from the last roll, or if the dice
-    # have not been rolled, rolls first.
-    def result
-      self.roll() if @result.empty?
-      return @result
+      self.roll() if @total.nil?
+      return @total
     end
 
     # The following methods ignore any :times and :explode 
@@ -311,11 +272,6 @@ module Dice
 
       sp = no_spaces ? "" : " "
       
-      s += case @parts[:times]
-        when 0..1 then ""
-        else @parts[:times].to_s + "x#{sp}"
-      end
-
       s += @parts[:num].to_s if @parts[:num] != 0
       s += "d"
       s += @parts[:sides].to_s if @parts[:sides] != 0
@@ -325,16 +281,15 @@ module Dice
         s += @parts[:explode].to_s if @parts[:explode] != @parts[:sides]
       end
 
-      s += case @parts[:mult]
-        when 0..1 then ""
-        else "#{sp}*" + @parts[:mult].to_s
-      end
-
+      s += "#{sp}*" + @parts[:mult].to_s if @parts[:mult] > 1
       s += "#{sp}!" + @parts[:keep].to_s if @parts[:keep] != 0
-
       s += "#{sp}r" + @parts[:reroll].to_s if @parts[:reroll] != 0
 
       return s
+    end
+
+    def <=>(other)
+      return self.total <=> other.total
     end
   end
 
@@ -401,6 +356,38 @@ module Dice
       return Dice.make_dice_string(@parsed)
     end
 
+  end
+
+  # This is a simplified subclass of Roll, for handling
+  # simple dice strings, like a single die roll. This
+  # operates just like the Roll class, except that it
+  # has some methods to more easily pull totals and a tally
+  # for the roll.
+  # This is for -simple- dice rolls only, no static parts
+  # or labels. Any extra parts are ignored.
+  # For example: 
+  #   SimpleRoll.new("1d20")
+  #        -- or --
+  #   SimpleRoll.new("1d6e")
+  class SimpleRoll < Roll
+
+    # Overrides the Roll#roll() method. Instead of returning
+    # the result array, it instead calls the super's method
+    # and then returns self.
+    def roll
+      super()
+      return self
+    end
+
+    def tally
+      self.roll() if @result.empty?
+      return @result.first.sections.first.tally()
+    end
+
+    def total
+      self.roll() if @result.empty?
+      return @result.first.total 
+    end
   end
 
   ##################
@@ -476,13 +463,6 @@ module Dice
     return all
   end
 
-  # Takes a nested array, such as that returned from
-  # parse_dice_string() and recreates the dice string.
-  def Dice.make_dice_string(arr=[])
-    return "" if arr.empty? or not arr.is_a?(Array)
-    return arr.collect {|part| make_substring(part)}.join(", ")
-  end
-
   # Examines the given string and determines with
   # subclass of SimplePart the part should be. If it
   # can't figure it out, it defaults to SimplePart.
@@ -498,11 +478,18 @@ module Dice
     return part
   end
 
+  # Takes a nested array, such as that returned from
+  # parse_dice_string() and recreates the dice string.
+  def Dice.make_dice_string(arr=[])
+    return "" if not arr.is_a?(Array) or arr.empty?
+    return arr.collect {|part| make_substring(part)}.join(", ")
+  end
+
   # Builds the individual section by calling
   # each part's to_s() method. Returns a string.
   def Dice.make_substring(arr=[])
     s = ""
-    return s if arr.empty? or not arr.is_a?(Array)
+    return s if not arr.is_a?(Array) or arr.empty?
 
     arr.each do |op, part|
       case op

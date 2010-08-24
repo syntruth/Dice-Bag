@@ -1,8 +1,12 @@
 Ruby Dice Lib
 =============
+
 **Name   :** Dice Library for Ruby
+
 **Author :** Randy Carnahan
-**Version:** 2.0
+
+**Version:** 2.5
+
 **License:** LGPL
 
 The dice library for Ruby is an attempt to bring a standard interface
@@ -43,8 +47,6 @@ part of a option.
 The options are given in the order they should appear in the simple
 dice string.
 
-**#x** - denotes how many times to roll the dice.
-
 **xDx** - denotes how many dice to roll and how many sides the dice
 should have. This is the standard RPG dice syntax. Note that if the 
 sides of the die is given as '%' it will be converted to 100 
@@ -64,10 +66,10 @@ to roll four 6-sided dice and keep the best 3 values.
 less, then the die is rolled again. Thus, '1d6r3' will only return a 
 result of 4, 5, or 6.
 
-**\*#** - this denotes a multiplier to the result of the dice roll. Note
+***#** - this denotes a multiplier to the result of the dice roll. Note
 that this option is applied *after* the dice have been rolled, coming 
 after any exploding or rerolling dice. Thus, '3d4 *10' will result in 
-a range of 30 to 120, whild '3d4 r1 *10' will result in a range of 20 to
+a range of 30 to 120, while '3d4 r1 *10' will result in a range of 20 to
 120.
 
 Dice String Limitations
@@ -140,7 +142,7 @@ you could do this, after getting the result from Dice::Roll.result():
 
     result = Dice::Roll.new("4d6 !3").result()
 
-    tally = result[0].sections[0].result[0].tally()
+    tally = result[0].sections[0].tally()
 
     puts "[%s]" % tally.join("][")
 

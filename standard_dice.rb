@@ -5,7 +5,7 @@ require "dicelib"
 
 module Dice
 
-  class Die < Roll
+  class Die < SimpleRoll
     def initialize(sides)
       super("1d#{sides}")
     end
@@ -13,8 +13,7 @@ module Dice
     def roll(modifier=0)
       modifier = 0 if not modifier.is_a?(Fixnum)
 
-      res = super()
-      return res.first.total + modifier
+      return super.total + modifier
     end
   end
 

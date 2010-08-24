@@ -1,3 +1,17 @@
+Changes for Version 2.5
+=======================
+* Modified standard_dice.rb dice to now use the SimpleRoll class.
+
+* Added SimpleRoll class, a subclass of the Roll class, that is meant
+  for simple, single dice rolls, without labels or any static parts.
+
+* Reworked RollPart to no longer deal with #x :times feature of the 
+  simple dice string. It was rarely used, and if using the lib 
+  programmatically, it's just much easier to loop over a Roll 
+  instance anyways. This allowed the removal of RollResult class and
+  cleaning up of some code, like moving the tally() method to within
+  the RollPart class.
+
 Changes for Version 2.1
 =======================
 
