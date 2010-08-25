@@ -1,5 +1,8 @@
 Changes for Version 2.5.2
 =========================
+* Bug fix for non-number 'e' exploding values, that stemmed from the
+  removal of the #x option.
+
 * Added gurps_dice.rb, a module extension that handles standard
   GURPS dice checks.
 
