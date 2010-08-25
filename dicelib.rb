@@ -1,6 +1,6 @@
 # Name   : Dice Library for Ruby
 # Author : Randy Carnahan
-# Version: 2.5.1
+# Version: 2.5.2
 # License: LGPL
 
 module Dice
@@ -232,34 +232,16 @@ module Dice
       return @total
     end
 
-    # The following methods ignore any :times and :explode 
-    # values, so these won't be overly helpful in figuring 
-    # out statistics or anything.
-
     def maximum()
-      num = @parts[:keep].zero? ? @parts[:num] : @parts[:keep]
-      mult = @parts[:mult].zero? ? 1 : @parts[:mult]
-      return ((num * @parts[:sides]) * mult)
+      return Dice.maximum(self)
     end
 
     def minimum()
-      # Short-circuit-ish logic here; if :sides and :reroll
-      # are the same, return maximum() instead.
-      return maximum() if @parts[:sides] == @parts[:reroll]
-
-      num = @parts[:keep].zero? ? @parts[:num] : @parts[:keep]
-      mult = @parts[:mult].zero? ? 1 : @parts[:mult]
-        
-      # Reroll value is <=, so we have to add 1 to get 
-      # the minimum value for the die.
-      sides = @parts[:reroll].zero? ? 1 : @parts[:reroll] + 1
-
-      return ((num * sides) * mult)
+      return Dice.minimum(self)
     end
 
     def average()
-      # Returns a float, of course.
-      return (self.maximum() + self.minimum()) / 2.0
+      return Dice.average(self)
     end
 
     # This takes the @parts hash and recreates the xDx
@@ -501,6 +483,40 @@ module Dice
     end
 
     return s.strip()
+  end
+
+  # The following methods ignore any :times and :explode 
+  # values, so these won't be overly helpful in figuring 
+  # out statistics or anything.
+
+  def Dice.maximum(arg)
+    parts = arg.is_a?(String) ? RollPart.new(arg).parts() : arg.parts()
+
+    num = parts[:keep].zero? ? parts[:num] : parts[:keep]
+    mult = parts[:mult].zero? ? 1 : parts[:mult]
+    return ((num * parts[:sides]) * mult)
+  end
+
+  def Dice.minimum(arg)
+    parts = arg.is_a?(String) ? RollPart.new(arg).parts() : arg.parts()
+
+    # Short-circuit-ish logic here; if :sides and :reroll
+    # are the same, return maximum() instead.
+    return maximum() if parts[:sides] == parts[:reroll]
+
+    num = parts[:keep].zero? ? parts[:num] : parts[:keep]
+    mult = parts[:mult].zero? ? 1 : parts[:mult]
+      
+    # Reroll value is <=, so we have to add 1 to get 
+    # the minimum value for the die.
+    sides = parts[:reroll].zero? ? 1 : parts[:reroll] + 1
+
+    return ((num * sides) * mult)
+  end
+
+  def Dice.average(arg)
+    # Returns a float, of course.
+    return (Dice.maximum(arg) + Dice.minimum(arg)) / 2.0
   end
 
 end

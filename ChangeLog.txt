@@ -1,3 +1,15 @@
+Changes for Version 2.5.2
+=========================
+* Added gurps_dice.rb, a module extension that handles standard
+  GURPS dice checks.
+
+* Moved the RollPart's maximum(), minimum(), and average() methods
+  out of the class and into the Dice module as module methods.
+  RollPart instances now just pass self to those methods. This allows
+  those methods to be used outside of a Roll/SimpleRoll/RollPart 
+  instances. These three methods now take either a simple dice string
+  or a RollPart instance.
+
 Changes for Version 2.5.1
 =========================
 * Removed attr :total from RollPart, since there is a method for
