@@ -138,11 +138,11 @@ module Dice
         parts = parts.captures.dup()
 
         # Handle special d% sides
-        parts[2] = 100 if parts[2] == "%"
+        parts[1] = 100 if parts[1] == "%"
 
         # Handle exploding value set to nothing.
         # Set it to the max-value of the die.
-        parts[3] = parts[2] if parts[3] == "e"
+        parts[2] = parts[1] if parts[2] == "e"
 
         # Convert them to numbers.
         parts.collect! do |i|
@@ -155,7 +155,7 @@ module Dice
         
         @parts[:num]     = parts[0] if parts[0] > 1
         @parts[:sides]   = parts[1] if parts[1] > 1
-        @parts[:explode] = parts[2] if parts[2] > 1
+        @parts[:explode] = parts[2] if parts[2] > 0
         @parts[:keep]    = parts[3] if parts[3] > 0
         @parts[:reroll]  = parts[4] if parts[4] > 0
         @parts[:mult]    = parts[5] if parts[5] > 1
