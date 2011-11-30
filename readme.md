@@ -64,10 +64,11 @@ to roll four 6-sided dice and keep the best 3 values.
 
 **r#** - this denotes a reroll value. If the die rolls this value or 
 less, then the die is rolled again. Thus, '1d6r3' will only return a 
-result of 4, 5, or 6.
+result of 4, 5, or 6. If the given value is larger than the number of
+sides on the die, then it defaults to the sides - 1.
 
-***#** - this denotes a multiplier to the result of the dice roll. Note
-that this option is applied *after* the dice have been rolled, coming 
+**\*#** - this denotes a multiplier to the result of the dice roll. Note
+that this option is applied **after** the dice have been rolled, coming 
 after any exploding or rerolling dice. Thus, '3d4 *10' will result in 
 a range of 30 to 120, while '3d4 r1 *10' will result in a range of 20 to
 120.
