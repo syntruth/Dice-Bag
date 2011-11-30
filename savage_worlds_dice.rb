@@ -11,7 +11,7 @@ module Dice
 
     def initialize(dstr)
       super(dstr)
-      @value = Dice.maximum(dstr)
+      @value     = Dice.maximum(dstr)
       @sw_result = nil
     end
 

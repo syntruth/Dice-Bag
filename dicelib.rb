@@ -12,12 +12,6 @@ module Dice
   TEST_COMPLEX = "(Attack) 1d20+8, (Damage) 2d8 + 8 + 1d6 - 3"
   TEST_SIMPLE  = "4d6 !3"
 
-  #############
-  # Constants #
-  #############
-
-  EXPLODE_LIMIT = 20
-
   #######################
   # Regular Expressions #
   #######################
@@ -86,7 +80,7 @@ module Dice
   # of the dice string.
   class StaticPart < SimplePart
     def initialize(num)
-      num = num.to_i() if num.is_a?(String)
+      num    = num.to_i() if num.is_a?(String)
       @value = num
     end
 
@@ -105,7 +99,26 @@ module Dice
   # to get the roll result.
   class RollPart < SimplePart
 
+    @@explode_limit = 20
+
     attr :parts
+
+    # This controls how high an exploding die is
+    # allowed to explode before a total is returned.
+    # This defaults to 20, which is a balance between
+    # allowing high exploding dice and prevents abuse.
+    # IE: 1d4e1 <-- would only roll 20 times by default.
+    def RollPart.explode_limit(value=nil)
+      if value and value.is_a?(Fixnum)
+        @@explode_limit = value
+      end
+      
+      return @@explode_limit
+    end
+
+    def RollPart.explode_limit=(value)
+      return RollPart.explode_limit(value)
+    end
 
     def initialize(dstr)
       @total  = nil
@@ -130,7 +143,7 @@ module Dice
     # into the individual parts.
     def parse()
 
-      dstr = @value.dup.downcase.gsub(/\s+/, "")
+      dstr  = @value.dup.downcase.gsub(/\s+/, "")
       parts = ROLL_REGEX.match(dstr)
 
       # Handle any crunchy-bits we found.
@@ -146,11 +159,7 @@ module Dice
 
         # Convert them to numbers.
         parts.collect! do |i|
-          if i.nil?
-            i = 0
-          else
-            i.gsub(/^[!*er]/, "").to_i()
-          end
+          i.nil? ? 0 : i.gsub(/^[!*er]/, "").to_i()
         end
         
         @parts[:num]     = parts[0] if parts[0] > 1
@@ -159,6 +168,13 @@ module Dice
         @parts[:keep]    = parts[3] if parts[3] > 0
         @parts[:reroll]  = parts[4] if parts[4] > 0
         @parts[:mult]    = parts[5] if parts[5] > 1
+
+        # Set the reroll value to reroll - 1 if the 
+        # reroll value is equal to or greater than the
+        # number of sides on the die; this is probably
+        # what the user meant anyways.
+        @parts[:reroll] -= 1 if @parts[:reroll] >= @parts[:sides]
+
       end
 
       return self
@@ -173,18 +189,17 @@ module Dice
     # Rolls a single die from the xDx string.
     def roll_die()
       num = 0
-      reroll = (@parts[:reroll] >= @parts[:sides]) ? 0 : @parts[:reroll]
 
-      while num <= reroll
+      while num <= @parts[:reroll]
         num = rand(@parts[:sides]) + 1
       end
 
       return num
     end
 
-    # Rolls the dice, saving the results in the @result
-    # instance variable. @result is cleared before the 
-    # roll is handled.
+    # Rolls the dice, saving the results in the @total
+    # instance variable. The roll tally is saved in the
+    # @tally instance variable.
     def roll
       results = []
 
@@ -200,7 +215,7 @@ module Dice
             roll = roll_die()
             results.push(roll)
             explode_limit += 1
-            break if explode_limit >= EXPLODE_LIMIT
+            break if explode_limit >= @@explode_limit
           end
         end
       end
@@ -252,7 +267,7 @@ module Dice
 
       sp = no_spaces ? "" : " "
       
-      s += @parts[:num].to_s if @parts[:num] != 0
+      s += @parts[:num].to_s   if @parts[:num] != 0
       s += "d"
       s += @parts[:sides].to_s if @parts[:sides] != 0
 
@@ -261,8 +276,8 @@ module Dice
         s += @parts[:explode].to_s if @parts[:explode] != @parts[:sides]
       end
 
-      s += "#{sp}*" + @parts[:mult].to_s if @parts[:mult] > 1
-      s += "#{sp}!" + @parts[:keep].to_s if @parts[:keep] != 0
+      s += "#{sp}*" + @parts[:mult].to_s   if @parts[:mult]   > 1
+      s += "#{sp}!" + @parts[:keep].to_s   if @parts[:keep]   != 0
       s += "#{sp}r" + @parts[:reroll].to_s if @parts[:reroll] != 0
 
       return s
@@ -443,7 +458,7 @@ module Dice
     return all
   end
 
-  # Examines the given string and determines with
+  # Examines the given string and determines which
   # subclass of SimplePart the part should be. If it
   # can't figure it out, it defaults to SimplePart.
   def Dice.get_part(dstr="")
@@ -455,6 +470,7 @@ module Dice
     else
       SimplePart.new(dstr)
     end
+
     return part
   end
 
@@ -492,8 +508,9 @@ module Dice
   def Dice.maximum(arg)
     parts = arg.is_a?(String) ? RollPart.new(arg).parts() : arg.parts()
 
-    num = parts[:keep].zero? ? parts[:num] : parts[:keep]
-    mult = parts[:mult].zero? ? 1 : parts[:mult]
+    num  = parts[:keep].zero? ? parts[:num] : parts[:keep]
+    mult = parts[:mult].zero? ? 1           : parts[:mult]
+
     return ((num * parts[:sides]) * mult)
   end
 
@@ -504,8 +521,8 @@ module Dice
     # are the same, return maximum() instead.
     return maximum() if parts[:sides] == parts[:reroll]
 
-    num = parts[:keep].zero? ? parts[:num] : parts[:keep]
-    mult = parts[:mult].zero? ? 1 : parts[:mult]
+    num  = parts[:keep].zero? ? parts[:num] : parts[:keep]
+    mult = parts[:mult].zero? ? 1           : parts[:mult]
       
     # Reroll value is <=, so we have to add 1 to get 
     # the minimum value for the die.

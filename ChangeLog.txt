@@ -1,7 +1,24 @@
+Changes for Version 2.5.3
+=========================
+* Changed how Exploding Dice work and parsed, slightly. Now, if the
+  explode value is equal to or equal the sides value, it is changed
+  to the explode value minus 1, which is probably what the user meant
+  anyways.
+* There is no longer an EXPLODE_LIMIT constant in the Dice module. 
+  Instead, the explode limit is set via the RollPart class using the
+  RollPart.explode_limit() class method. Calling that method without
+  an argument returns the current explode limit, otherwise if called
+  with a fixnum value, it sets the explode limit. The explode limit
+  still defaults to 20.
+* Various minor code clean ups spread across dicelib and the sub-libs.
+
 Changes for Version 2.5.2
 =========================
 * Bug fix for non-number 'e' exploding values, that stemmed from the
   removal of the #x option.
+
+* Added savage_worlds_dice.rb to handle Savage Worlds RPG dice
+  mechanics.
 
 * Added gurps_dice.rb, a module extension that handles standard
   GURPS dice checks.
