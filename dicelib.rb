@@ -1,6 +1,6 @@
 # Name   : Dice Library for Ruby
 # Author : Randy Carnahan
-# Version: 2.5.2
+# Version: 2.5.3
 # License: LGPL
 
 module Dice
@@ -169,12 +169,13 @@ module Dice
         @parts[:reroll]  = parts[4] if parts[4] > 0
         @parts[:mult]    = parts[5] if parts[5] > 1
 
-        # Set the reroll value to reroll - 1 if the 
+        # Set the reroll value to sides - 1 if the 
         # reroll value is equal to or greater than the
         # number of sides on the die; this is probably
         # what the user meant anyways.
-        @parts[:reroll] -= 1 if @parts[:reroll] >= @parts[:sides]
-
+        if @parts[:reroll] >= @parts[:sides]
+          @parts[:reroll] = @parts[:sides] - 1
+        end
       end
 
       return self
