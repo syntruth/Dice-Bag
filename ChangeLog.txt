@@ -1,9 +1,8 @@
 Changes for Version 2.5.3
 =========================
-* Changed how Exploding Dice work and parsed, slightly. Now, if the
-  explode value is equal to or greater the sides value, it is changed
-  to the explode value minus 1, which is probably what the user meant
-  anyways.
+* Changed how Reroll parsing works, slightly. Now, if the reroll value
+  is equal to or greater the sides value, it is changed sides value 
+  minus 1, which is probably what the user meant anyways.
 * There is no longer an EXPLODE_LIMIT constant in the Dice module. 
   Instead, the explode limit is set via the RollPart class using the
   RollPart.explode_limit() class method. Calling that method without
