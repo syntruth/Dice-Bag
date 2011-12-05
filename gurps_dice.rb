@@ -16,9 +16,9 @@ module Dice
 
       total_target = target + mod
 
-      crit_success += [5]  if total_target >= 15
-      crit_success += [6]  if total_target >= 16
-      crit_failure += [17] if total_target <= 15
+      crit_success.push(5)  if total_target >= 15
+      crit_success.push(6)  if total_target >= 16
+      crit_failure.push(17) if total_target <= 15
 
       result = super().total()
 
