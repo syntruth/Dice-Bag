@@ -229,7 +229,7 @@ module Dice
       end
        
       @total = results.inject(0) {|t, i| t += i}
-      @total = total * @parts[:mult] if @parts[:mult] > 1
+      @total = @total * @parts[:mult] if @parts[:mult] > 1
 
       return self
     end
