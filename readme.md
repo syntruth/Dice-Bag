@@ -7,7 +7,7 @@ Ruby Dice Lib
 
 **Version:** 2.5
 
-**License:** LGPL
+**License:** LGPL OR MIT
 
 The dice library for Ruby is an attempt to bring a standard interface
 to every gamer's (RPG and otherwise) need to have dice rolled. The 
