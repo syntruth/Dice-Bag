@@ -5,9 +5,11 @@ Ruby Dice Lib
 
 **Author :** Randy Carnahan
 
-**Version:** 2.5
+**Version:** 3.0b
 
 **License:** LGPL OR MIT
+
+**THIS IS OUTDATED NOW. UPDATE IN THE WORKS!**
 
 The dice library for Ruby is an attempt to bring a standard interface
 to every gamer's (RPG and otherwise) need to have dice rolled. The 

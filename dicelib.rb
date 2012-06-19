@@ -1,540 +1,107 @@
-# Name   : Dice Library for Ruby
-# Author : Randy Carnahan
-# Version: 2.5.3
-# License: LGPL
+require 'rubygems'
+require 'parslet'
 
 module Dice
+  class Parser < Parslet::Parser
 
-  ####################
-  ### Test Strings ###
-  ####################
+    # Base rules.
+    rule(:space?)  { str(' ').repeat }
+    rule(:number)  { match('[0-9]').repeat(1) }
+    rule(:number?) { number.maybe }
 
-  TEST_COMPLEX = "(Attack) 1d20+8, (Damage) 2d8 + 8 + 1d6 - 3"
-  TEST_SIMPLE  = "4d6 !3"
+    # count and sides rules.
+    rule(:count) { number?.as(:count) }
+    rule(:sides) { match('[dD]') >> number.as(:sides) }
 
-  #######################
-  # Regular Expressions #
-  #######################
+    # Roll Options.
+    rule(:explode) { str('e') >> number?.as(:explode) }
+    rule(:drop)    { str('~') >> number.as(:drop) }
+    rule(:keep)    { str('!') >> number.as(:keep) }
+    rule(:reroll)  { str('r') >> number.as(:reroll) }
 
-  SECTION_REGEX = /([+-]|[0-9*!xder]+)/i
+    rule(:options) { 
+      space? >> (drop | explode | keep | reroll).repeat >> space?
+    }
 
-  ROLL_REGEX = /
-    (\d{1,2})?d(\d{1,3}|\%)    # The dice to roll, xDx format
-    (e\d{0,2})?                # Explode value
-    (!\d{1,2})?                # Keep value
-    (r\d{1,2})?                # Reroll value
-    (\*\d{1,2})?               # Multiplier
-  /xi
+    rule(:options?) { options.maybe.as(:options) }
 
-  ###########
-  # Classes #
-  ###########
+    # Static modifiers.
+    rule(:add) { str('+') }
+    rule(:sub) { str('-') }
+    rule(:mul) { str('*') }
+    rule(:div) { str('/') }
 
-  # This models a complex dice string result.
-  class ComplexResult
-    attr :total
-    attr :sections
-    attr :label
-    attr :parsed
+    rule(:op)   { (add | sub | mul | div).as(:op) }
+    rule(:mod)  { space? >> op >> space? >> number.as(:mod) >> space? }
+    rule(:mods) { mod.repeat.as(:mods) }
 
-    def initialize(total=0, sections=[], label="", parsed=[])
-      @total    = total
-      @sections = sections
-      @label    = label
-      @parsed   = parsed
-    end
+    rule(:dice) { (count >> sides).as(:xdx) >> options? >> mods }
 
-    def to_s
-      @label.empty? ? @total.to_s() : "%s: %s" % [@label, @total]
-    end
+    root(:dice)
   end
 
-  # The most simplest of a part. If a given part of
-  # a dice string is not a Label, Fixnum, or a xDx part
-  # it will be an instance of this class, which simply
-  # returns the value given to it.
-  class SimplePart
-    attr :value
+  class Transform < Parslet::Transform
 
-    def initialize(part)
-      @value = part
-    end
+    rule(:count => simple(:x)) { Integer(x) }
+    rule(:sides => simple(:x)) { Integer(x) }
 
-    def result
-      return @value
-    end
+    rule(:explode => simple(:x)) { [:explode, Integer(x)] }
+    rule(:drop    => simple(:x)) { [:drop,    Integer(x)] }
+    rule(:keep    => simple(:x)) { [:keep,    Integer(x)] }
+    rule(:reroll  => simple(:x)) { [:reroll,  Integer(x)] }
 
-    def to_s
-      return @value
-    end
-  end
-
-  # The subclass for a label.
-  class LabelPart < SimplePart
-    def to_s
-      return "(%s)" % @value
-    end
-  end
-
-  # This represents a static, non-random number part
-  # of the dice string.
-  class StaticPart < SimplePart
-    def initialize(num)
-      num    = num.to_i() if num.is_a?(String)
-      @value = num
-    end
-
-    def total
-      return @value
-    end
-
-    def to_s
-      return @value.to_s()
-    end
-  end
-
-  # This represents the xDx part of the dice string.
-  # It takes the xDx part of the dice string and parses it
-  # to get the individual parts. It also provides methods for
-  # to get the roll result.
-  class RollPart < SimplePart
-
-    @@explode_limit = 20
-
-    attr :parts
-
-    # This controls how high an exploding die is
-    # allowed to explode before a total is returned.
-    # This defaults to 20, which is a balance between
-    # allowing high exploding dice and prevents abuse.
-    # IE: 1d4e1 <-- would only roll 20 times by default.
-    def RollPart.explode_limit(value=nil)
-      if value and value.is_a?(Fixnum)
-        @@explode_limit = value
+    rule(:mod => simple(:m), :op => simple(:o)) do
+      op = case o
+      when '+' then :add
+      when '-' then :sub
+      when '*' then :mul
+      when '/' then :div
+      else :unknown
       end
-      
-      return @@explode_limit
+
+      [op, Integer(m)]
     end
 
-    def RollPart.explode_limit=(value)
-      return RollPart.explode_limit(value)
-    end
-
-    def initialize(dstr)
-      @total  = nil
-      @tally  = []
-      @value  = dstr
-
-      # Our Default Values
-      @parts = {
-        :times   => 1,
-        :num     => 1,
-        :sides   => 6,
-        :keep    => 0,
-        :explode => 0,
-        :reroll  => 0,
-        :mult    => 0,
+    rule(:count => simple(:c), :sides => simple(:s)) do
+      {
+        :count => Integer(c),
+        :sides => Integer(s)
       }
-
-      self.parse()
-    end
-
-    # Uses the ROLL_REGEX constant to parse the xDx string
-    # into the individual parts.
-    def parse()
-
-      dstr  = @value.dup.downcase.gsub(/\s+/, "")
-      parts = ROLL_REGEX.match(dstr)
-
-      # Handle any crunchy-bits we found.
-      if parts
-        parts = parts.captures.dup()
-
-        # Handle special d% sides
-        parts[1] = 100 if parts[1] == "%"
-
-        # Handle exploding value set to nothing.
-        # Set it to the max-value of the die.
-        parts[2] = parts[1] if parts[2] == "e"
-
-        # Convert them to numbers.
-        parts.collect! do |i|
-          i.nil? ? 0 : i.gsub(/^[!*er]/, "").to_i()
-        end
-        
-        @parts[:num]     = parts[0] if parts[0] > 1
-        @parts[:sides]   = parts[1] if parts[1] > 1
-        @parts[:explode] = parts[2] if parts[2] > 0
-        @parts[:keep]    = parts[3] if parts[3] > 0
-        @parts[:reroll]  = parts[4] if parts[4] > 0
-        @parts[:mult]    = parts[5] if parts[5] > 1
-
-        # Set the reroll value to sides - 1 if the 
-        # reroll value is equal to or greater than the
-        # number of sides on the die; this is probably
-        # what the user meant anyways.
-        if @parts[:reroll] >= @parts[:sides]
-          @parts[:reroll] = @parts[:sides] - 1
-        end
-      end
-
-      return self
-    end
-
-    # Checks to see if this instance has rolled yet
-    # or not.
-    def has_rolled?
-      return @total.nil? ? false : true
-    end
-
-    # Rolls a single die from the xDx string.
-    def roll_die()
-      num = 0
-
-      while num <= @parts[:reroll]
-        num = rand(@parts[:sides]) + 1
-      end
-
-      return num
-    end
-
-    # Rolls the dice, saving the results in the @total
-    # instance variable. The roll tally is saved in the
-    # @tally instance variable.
-    def roll
-      results = []
-
-      @parts[:num].times do
-        roll = roll_die()
-
-        results.push(roll)
-
-        if @parts[:explode] > 0
-          explode_limit = 0
-
-          while roll >= @parts[:explode]
-            roll = roll_die()
-            results.push(roll)
-            explode_limit += 1
-            break if explode_limit >= @@explode_limit
-          end
-        end
-      end
-
-      @tally = results.dup()
-      results.sort!.reverse!
-
-      if @parts[:keep] > 0
-        results = results[0 ... @parts[:keep]]
-      end
-       
-      @total = results.inject(0) {|t, i| t += i}
-      @total = @total * @parts[:mult] if @parts[:mult] > 1
-
-      return self
-    end
-
-    # Returns the tally from the roll. This is the entire
-    # tally, even if a :keep option was given.
-    def tally(do_sort=true)
-      return @tally.dup.sort.reverse() if do_sort
-      return @tally
-    end
-
-    # Gets the total of the last roll; if there is no 
-    # last roll, it calls roll() first.
-    def total
-      self.roll() if @total.nil?
-      return @total
-    end
-
-    def maximum()
-      return Dice.maximum(self)
-    end
-
-    def minimum()
-      return Dice.minimum(self)
-    end
-
-    def average()
-      return Dice.average(self)
-    end
-
-    # This takes the @parts hash and recreates the xDx
-    # string. Optionally, passing true to the method will
-    # remove spaces form the finished string.
-    def to_s(no_spaces=false)
-      s = ""
-
-      sp = no_spaces ? "" : " "
-      
-      s += @parts[:num].to_s   if @parts[:num] != 0
-      s += "d"
-      s += @parts[:sides].to_s if @parts[:sides] != 0
-
-      if @parts[:explode] != 0
-        s += "#{sp}e"
-        s += @parts[:explode].to_s if @parts[:explode] != @parts[:sides]
-      end
-
-      s += "#{sp}*" + @parts[:mult].to_s   if @parts[:mult]   > 1
-      s += "#{sp}!" + @parts[:keep].to_s   if @parts[:keep]   != 0
-      s += "#{sp}r" + @parts[:reroll].to_s if @parts[:reroll] != 0
-
-      return s
-    end
-
-    def <=>(other)
-      return self.total <=> other.total
-    end
-  end
-
-  # Main class in the Dice module
-  # This takes a complex dice string on instatiation,
-  # parses it into it's individual parts, and then with
-  # a call to the roll() method, will return an array of
-  # results. Each element of the returned array will be an
-  # instance of the ComplexResult structure, representing
-  # a section of the complex dice string.
-  class Roll
-    attr :parsed
-
-    def initialize(dstr="")
-      @parsed = Dice.parse_dice_string(dstr)
-      @result = []
-    end
-
-    def result
-      self.roll() if @result.empty?
-      return @result
-    end
-
-    def roll
-      @result = []
-
-      @parsed.each do |section|
-        total    = 0
-        sections = []
-        label    = ""
-
-        section.each do |op, part|
-          
-          # If this is a RollPart instance,
-          # ensure fresh results.
-          part.roll() if part.is_a?(RollPart)
-            
-          case op
-          when :label
-            label = part.value()
-          when :start
-            total = part.total()
-            sections.push(part)
-          when :add
-            total += part.total()
-            sections.push(part)
-          when :sub
-            total -= part.total()
-            sections.push(part)
-          end
-        end
-
-        res = ComplexResult.new(total, sections, label, section)
-
-        @result.push(res)
-      end
-
-      return @result
-    end
-
-    # Recreates the complex dice string from the 
-    # parsed array.
-    def to_s
-      return Dice.make_dice_string(@parsed)
     end
 
   end
 
-  # This is a simplified subclass of Roll, for handling
-  # simple dice strings, like a single die roll. This
-  # operates just like the Roll class, except that it
-  # has some methods to more easily pull totals and a tally
-  # for the roll.
-  # This is for -simple- dice rolls only, no static parts
-  # or labels. Any extra parts are ignored.
-  # For example: 
-  #   SimpleRoll.new("1d20")
-  #        -- or --
-  #   SimpleRoll.new("1d6e")
-  class SimpleRoll < Roll
+  def self.normalize_tree(tree)
+    tree[:count] = tree[:xdx][:count]
+    tree[:sides] = tree[:xdx][:sides]
 
-    # Overrides the Roll#roll() method. Instead of returning
-    # the result array, it instead calls the super's method
-    # and then returns self.
-    def roll
-      super()
-      return self
-    end
+    tree.delete(:xdx)
 
-    def tally
-      self.roll() if @result.empty?
-      return @result.first.sections.first.tally()
-    end
-
-    def total
-      self.roll() if @result.empty?
-      return @result.first.total 
-    end
+    return tree
   end
+end 
 
-  ##################
-  # Module Methods #
-  ##################
+if $0 == __FILE__
+  require 'pp'
 
-  # Parses a complex dice string made up of one or more
-  # comma-separated parts, each with an optional label.
-  #
-  # Example complex dice string:
-  #   (Attack) 1d20+8, (Damage) 2d8 + 8 + 1d6 - 3
-  #
-  # Parsed to:
-  #   [
-  #     [
-  #       [:label, "Attack"],
-  #       [:start, "1d20"],
-  #       [:add,   "8"]
-  #     ],
-  #     [
-  #       [:label, "Damage"],
-  #       [:start, "2d8"],
-  #       [:add,   "8"],
-  #       [:add,   "1d6"],
-  #       [:sub,   "3"]
-  #     ]
-  #   ]
-  #
-  # Each part (the 2nd element in each sub-array) is a 
-  # subclass of SimplePart: LabelPart, StaticPart, or
-  # RollPart.
-  def Dice.parse_dice_string(dstr="")
-    all = []
+  dstrs = [
+    # Basic rolls.
+    '2d10', '1D20', 'd8',
+    '1d20 +5', '2d4+2-1',
+    
+    # Complex ones!
+    '5d6!3e + 4 - 1', 
+    '6d12~2e10 +5 + 3'
+  ]
 
-    # Get our sections.
-    sections = dstr.split(/,/)
+  dstrs.each do |dstr|
+    puts "Trying #{dstr}"
 
-    sections.each do |subsec|
-      sec = []
-      
-      # First we look for labels.
-      labels = subsec.scan(/\((.*?)\)/).flatten()
-
-      # ...and then remove them and any spaces.
-      subsec.gsub!(/\(.*?\)|\s/, "")
-
-      # Record the first label found.
-      if not labels.empty?
-        label = labels.first()
-        sec.push([:label, LabelPart.new(label)])
-      end
-
-      subs = subsec.scan(SECTION_REGEX).flatten()
-
-      op = :start
-
-      subs.each do |s|
-        case s
-        when "+"
-          op = :add
-        when "-"
-          op = :sub
-        else
-          value = get_part(s)
-          sec.push [op, value]
-        end
-      end
-
-      all.push(sec)
-
-    end
-
-    return all
+    tree = Dice::Parser.new.parse(dstr)
+    ast  = Dice::Transform.new.apply(tree)
+    
+    pp Dice.normalize_tree(ast)
+    puts ""
   end
-
-  # Examines the given string and determines which
-  # subclass of SimplePart the part should be. If it
-  # can't figure it out, it defaults to SimplePart.
-  def Dice.get_part(dstr="")
-    part = case dstr
-    when /^\d+$/
-      StaticPart.new(dstr)
-    when ROLL_REGEX
-      RollPart.new(dstr)
-    else
-      SimplePart.new(dstr)
-    end
-
-    return part
-  end
-
-  # Takes a nested array, such as that returned from
-  # parse_dice_string() and recreates the dice string.
-  def Dice.make_dice_string(arr=[])
-    return "" if not arr.is_a?(Array) or arr.empty?
-    return arr.collect {|part| make_substring(part)}.join(", ")
-  end
-
-  # Builds the individual section by calling
-  # each part's to_s() method. Returns a string.
-  def Dice.make_substring(arr=[])
-    s = ""
-    return s if not arr.is_a?(Array) or arr.empty?
-
-    arr.each do |op, part|
-      case op
-      when :label, :start
-        s += "%s "   % part.to_s()
-      when :add
-        s += "+ %s " % part.to_s()
-      when :sub
-        s += "- %s " % part.to_s()
-      end
-    end
-
-    return s.strip()
-  end
-
-  # The following methods ignore any :times and :explode 
-  # values, so these won't be overly helpful in figuring 
-  # out statistics or anything.
-
-  def Dice.maximum(arg)
-    parts = arg.is_a?(String) ? RollPart.new(arg).parts() : arg.parts()
-
-    num  = parts[:keep].zero? ? parts[:num] : parts[:keep]
-    mult = parts[:mult].zero? ? 1           : parts[:mult]
-
-    return ((num * parts[:sides]) * mult)
-  end
-
-  def Dice.minimum(arg)
-    parts = arg.is_a?(String) ? RollPart.new(arg).parts() : arg.parts()
-
-    # Short-circuit-ish logic here; if :sides and :reroll
-    # are the same, return maximum() instead.
-    return maximum() if parts[:sides] == parts[:reroll]
-
-    num  = parts[:keep].zero? ? parts[:num] : parts[:keep]
-    mult = parts[:mult].zero? ? 1           : parts[:mult]
-      
-    # Reroll value is <=, so we have to add 1 to get 
-    # the minimum value for the die.
-    sides = parts[:reroll].zero? ? 1 : parts[:reroll] + 1
-
-    return ((num * sides) * mult)
-  end
-
-  def Dice.average(arg)
-    # Returns a float, of course.
-    return (Dice.maximum(arg) + Dice.minimum(arg)) / 2.0
-  end
-
 end
+
