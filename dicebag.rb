@@ -23,7 +23,7 @@
 require 'rubygems'
 require 'parslet'
 
-module Dice
+module DiceBag
 
   DefaultRoll = "1d6"
 
@@ -635,7 +635,7 @@ if $0 == __FILE__
   dstrs.each do |dstr|
     puts "Trying #{dstr}"
 
-    roll = Dice::Roll.new(dstr)
+    roll = DiceBag::Roll.new(dstr)
     res  = roll.result()
 
     pp roll.tree

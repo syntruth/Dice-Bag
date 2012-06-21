@@ -1,7 +1,7 @@
 Ruby Dice Lib
 =============
 
-**Name   :** Dice Library for Ruby
+**Name   :** Dice Bag Library for Ruby
 
 **Author :** Randy Carnahan
 
@@ -34,7 +34,7 @@ part of the string.
 Installation
 ------------
 
-    gem install dicelib
+    gem install dicebag
 
 
 Dice Strings
@@ -119,8 +119,8 @@ Using the library is rather straight forward:
 
     require 'dicelib'
 
-    dice    = Dice::Roll.new("(Damage) 2d8 + 5 + 1d6")
-    results = dice.result()
+    dice   = Dice::Roll.new("(Damage) 2d8 + 5 + 1d6")
+    result = dice.result()
 
     puts result
 
