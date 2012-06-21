@@ -20,14 +20,13 @@
 #
 # dicelib.rb -- version: 3.0
 
-require 'rubygems'
 require 'parslet'
 
 module DiceBag
 
   DefaultRoll = "1d6"
 
-  class DiceError < Exception; end
+  class DiceBagError < Exception; end
 
   class Parser < Parslet::Parser
 
@@ -366,7 +365,7 @@ module DiceBag
     end
   end
 
-  # This is the 'main' class of DiceLib. This class
+  # This is the 'main' class of Dice Bag. This class
   # takes the dice string, parses it, and encapsulates
   # the actual rolling of the dice. If no dice string
   # is given, it defaults to DefaultRoll.
@@ -378,7 +377,7 @@ module DiceBag
 
     def initialize(dstr=nil)
       @dstr   = dstr ||= DefaultRoll
-      @tree   = Dice.parse(dstr)
+      @tree   = DiceBag.parse(dstr)
       @result = nil
     end
 
@@ -484,7 +483,8 @@ module DiceBag
     end
 
     def to_s
-      return "#{self.label}: #{self.total}"
+      return "#{self.label}: #{self.total}" unless self.label.empty?
+      return self.total.to_s
     end
   end
 
@@ -612,7 +612,7 @@ module DiceBag
       # We're merely re-wrapping the error here to 
       # hide implementation from user who doesn't care
       # to read the source.
-      raise DiceError, "Dice Parse Error for string: #{dstr}"
+      raise DiceBagError, "Dice Parse Error for string: #{dstr}"
     end
   end
 end 
