@@ -247,13 +247,14 @@ module Dice
     attr :count
     attr :sides
     attr :parts
+    attr :options
 
     def initialize(part)
       @total  = nil
       @tally  = []
       @value  = part
-      @count  = part[:xdx][:count]
-      @sides  = part[:xdx][:sides]
+      @count  = part[:count]
+      @sides  = part[:sides]
 
       # Our Default Options
       @options = {
@@ -263,18 +264,7 @@ module Dice
         :reroll  => 0
       }
 
-      if part.has_key?(:options)
-        @options.update(part[:options])
-
-        # Negate :drop if it's non-zero, since
-        # in #roll, it's used as a negative index
-        # for an array slice.
-        @options[:drop] = -(@options[:drop]) if @options[:drop] > 0
-
-        # Check for nil :explode and set it
-        # to @sides.
-        @options[:explode] = @sides if @options[:explode].nil?
-      end
+      @options.update(part[:options]) if part.has_key?(:options)
     end
 
     # Checks to see if this instance has rolled yet
@@ -286,7 +276,7 @@ module Dice
     # Rolls a single die from the xDx string.
     def roll_die()
       num    = 0
-      reroll = (@options[:reroll] >= self.sides) ? 0 : @options[:reroll]
+      reroll = @options[:reroll]
 
       while num <= reroll
         num = rand(self.sides) + 1
@@ -297,20 +287,17 @@ module Dice
 
     def roll
       results = []
+      explode = @options[:explode]
 
       self.count.times do
         roll = self.roll_die()
 
         results.push(roll)
 
-        if @options[:explode] > 0
-          explode_limit = 0
-
-          while roll >= @options[:explode]
+        unless explode.zero?
+          while roll >= explode
             roll = self.roll_die()
             results.push(roll)
-            explode_limit += 1
-            break if explode_limit >= ExplodeLimit
           end
         end
       end
@@ -512,7 +499,15 @@ module Dice
         end
 
         val = part.last
-        val = val.is_a?(Hash) ? RollPart.new(val) : StaticPart.new(val)
+        
+        # If the value is a hash, it's an :xdx hash.
+        # Normalize it.
+        if val.is_a?(Hash)
+          xdx = normalize_xdx(val)
+          val = RollPart.new(xdx)
+        else
+          val = StaticPart.new(val)
+        end
 
         part = [op, val]
       end
@@ -524,9 +519,56 @@ module Dice
   # This further massages the xDx hashes. Mostly, 
   # this now just deletes empty :options values.
   def self.normalize_xdx(xdx)
-    if xdx[:options].to_s.strip.empty?
+    count = xdx[:xdx][:count]
+    sides = xdx[:xdx][:sides]
+    notes = []
+
+    # Default to at least 1 die.
+    count = 1 if count.zero? or count.nil?
+
+    # Set the :count and :sides keys directly
+    # and get ride of the :xdx sub-hash.
+    xdx[:count] = count
+    xdx[:sides] = sides
+    xdx.delete(:xdx)
+
+    if xdx[:options].empty?
       xdx.delete(:options)
+    else
+      # VALIDATE ALL THE OPTIONS!!!
+
+      # Prevent Explosion abuse.
+      if xdx[:options].has_key?(:explode)
+        explode = xdx[:options][:explode]
+        if explode.nil? or explode.zero? or explode == 1
+          xdx[:options][:explode] = sides
+          notes.push("Explode set to #{sides}")
+        end
+      end
+
+      # Prevent Reroll abuse.
+      if xdx[:options].has_key?(:reroll) and xdx[:options][:reroll] >= sides
+        xdx[:options][:reroll] = 0 
+        notes.push("Reroll reset to 0.")
+      end
+
+      # Make sure there are enough dice to
+      # handle both Drop and Keep values.
+      # If not, both are reset to 0. Harsh.
+      drop = xdx[:options][:drop] || 0
+      keep = xdx[:options][:keep] || 0
+
+      if (drop + keep) >= count
+        xdx[:options][:drop] = 0
+        xdx[:options][:keep] = 0
+        notes.push("Drop and Keep Conflict. Both reset to 0.")
+      end
+
+      # Negate :drop. See why in RollPart#roll.
+      xdx[:options][:drop] = -(drop)
     end
+
+    xdx[:options][:notes] = notes unless notes.empty?
 
     return xdx
   end
