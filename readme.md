@@ -9,8 +9,6 @@ Ruby Dice Lib
 
 **License:** LGPL OR MIT
 
-**THIS IS OUTDATED NOW. UPDATE IN THE WORKS!**
-
 The dice library for Ruby is an attempt to bring a standard interface
 to every gamer's (RPG and otherwise) need to have dice rolled. The 
 centralized concept to this is taking a standard formatted string and
@@ -33,6 +31,12 @@ dice to explode (see below) and to keep the 3 highest rolls. Now, the
 e6 and !3 (and the other options) can be in any order after the xDx
 part of the string.
 
+Installation
+------------
+
+    gem install dicelib
+
+
 Dice Strings
 ------------
 
@@ -47,13 +51,14 @@ A dice string is made up of one or more parts that consist of either:
 - an optional label, which must be the first part of the string.
   Labels are defined within parenthesis.
 - an xDx (such as 3d6) definition and options for that definition.
-- a static modifier that is applied to the current total.
+- modifiers that is applied to the current total. These are either
+  static values or additional xDx strings.
 
 The allowed static modifiers are add (+), subtract (-), multiply (\*),
-and divide (/). As the library (in the Roll class) enumerates over the
+and divide (/). As the library (in the Roll class) iterates over the
 parsed tree, a total for that roll is kept; the static modifiers are 
 applied *in the order they are gotten*, which is to say, the standard
-order of arithmetic calculations do not apply. 
+order of arithmetic calculations do not apply.
 
 For example:
 
@@ -71,10 +76,8 @@ In the following section, note that # is used to denote the number
 part of a option.
 
 **xDx** - denotes how many dice to roll and how many sides the dice
-should have. This is the standard RPG dice syntax. Note that if the 
-sides of the die is given as '%' it will be converted to 100 
-automatically. This *must* come before any options for a given set of
-dice.
+should have. This is the standard RPG dice syntax. This *must* come 
+before any options for a given set of dice.
 
 **e#** - the explode value. Some game systems call this 'open ended'
 dice. If the number rolled is greater than or equal to the value given
@@ -84,51 +87,55 @@ number of sides on the die. Thus, '1d6e' is the same as '1d6e6'.
 
 **~#** - this denotes how many dice to drop from the tally. These dice
 are dropped *before* any dice are kept with !# below. So, '5d6 ~2' 
-means roll five 6-sided dice and drop the lowest 2 values.
+means roll five 6-sided dice and drop the lowest 2 values. If the given
+value (combined with how many dice to keep) are greater than the number
+of dice in the xDx string, this value will be reset to 0.
 
 **!#** - this denotes how many dice to keep out of the number of dice
 rolled, keeping the highest values from the roll. Thus, '4d6 !3' means
-to roll four 6-sided dice and keep the best 3 values.
+to roll four 6-sided dice and keep the best 3 values. If the given value
+(combined with how many dice to drop) are greater than the number of dice
+in the xDx string, this value will be reset to 0.
 
 **r#** - this denotes a reroll value. If the die rolls this value or 
 less, then the die is rolled again. Thus, '1d6r3' will only return a 
 result of 4, 5, or 6. If the given value is larger than the number of
-sides on the die, then it defaults to the sides - 1.
+sides on the die, then it is reset to 0.
+
+Note: if any value is reset because of a validation failure, a note is
+attached to the Roll.
 
 Dice String Limitations
 -----------------------
 
-Within the dice library itself, simple (xDx) strings are limited to 2
-digits for all parts of the string except for the sides of the given
-die, which can be up to 3 digits.
+Within the dice library itself, simple (xDx) strings are limited to 3
+digits for all parts of the string. This is to prevent honkin' huge 
+numbers that *some* users abuse to lag out the dice rolling process.
 
 Using the Dice Library
 ----------------------
-
-**TODO:** Update this section!
 
 Using the library is rather straight forward:
 
     require 'dicelib'
 
-    dice = Dice::Roll.new("(Damage) 2d8 + 5 + 1d6")
-
+    dice    = Dice::Roll.new("(Damage) 2d8 + 5 + 1d6")
     results = dice.result()
 
-    results.each do |result|
-      puts "%10s: %s" % [result.label, result.total]
-    end
+    puts result
 
 This would output something like the following:
 
     Damage: 15
 
+The returned result from Roll#result is an instance of the Result
+class, which has methods to access the label (if any), the total of
+the roll, and also each of the sections that made up the roll. 
+
 It is possible to get the individual sections values as well:
 
-    results.each do |result|
-      result.sections.each do |section|
-        puts "%-4s: %s" % [section.to_s(), section.result()]
-      end
+    result.each do |section|
+      puts "%s: %s" % [section, section.total]
     end
 
 For the above given dice string, would print something like this:
@@ -140,25 +147,43 @@ For the above given dice string, would print something like this:
 Also, if you are curious to see how the dice string was parsed, you can 
 retrieved the parsed value from the Roll instance using the tree() method:
 
-    parsed = roll.tree()
+    parsed = dice.tree()
 
 For the above given dice string, this returns a nested array of values:
 
-    Put tree ouput here!
+    [[:label, #<Dice::LabelPart:0x1091f2980 @value="Damage"],
+    [:start,
+      #<Dice::RollPart:0x1091f2840
+        @count=2,
+        @notes=[],
+        @options={:keep=>0, :reroll=>0, :explode=>0, :drop=>0},
+        @sides=8,
+        @tally=[5, 2],
+        @total=7,
+        @value={:sides=>8, :count=>2}>],
+    [:add, #<Dice::StaticPart:0x1091f2750 @value=5>],
+    [:add,
+      #<Dice::RollPart:0x1091f2688
+        @count=1,
+        @notes=[],
+        @options={:keep=>0, :reroll=>0, :explode=>0, :drop=>0},
+        @sides=6,
+        @tally=[3],
+        @total=3,
+        @value={:sides=>6, :count=>1}>]]
 
 Typically, you won't have to deal with the internals of a dice roll if all
 you want are the results. However, you can dig down into the returned
-result's classes to obtain pretty much any data you want.
+result's classes to obtain pretty much any data you want. Most, if not
+all, of the instance properties have attr accessors set up.
 
 For example, if you wanted to know the actual dice tally of a '4d6 !3' roll,
 you could do this, after getting the result from Dice::Roll.result():
 
     result = Dice::Roll.new("4d6 !3").result()
-
-    tally = result[0].sections[0].tally()
+    tally  = result[0].sections[0].tally()
 
     puts "[%s]" % tally.join("][")
 
-Most of the classes have to_s() methods that'll work for most cases.
-
+All of the classes have to_s() methods that'll work for most cases.
 

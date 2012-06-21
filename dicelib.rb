@@ -27,12 +27,6 @@ module Dice
 
   DefaultRoll = "1d6"
 
-  # This is to limit how many times a die
-  # can explode (aka, 'open ended' roll).
-  # It's set to allow a high enough chance
-  # but set low enough to prevent abuse.
-  ExplodeLimit = 20
-
   class DiceError < Exception; end
 
   class Parser < Parslet::Parser
@@ -77,10 +71,10 @@ module Dice
     # Note that :explode is allowed to NOT have a number
     # assigned, which will leave it with a nil value.
     # This is handled in RollPart#initialize.
-    rule(:explode) { str('e') >> number?.as(:explode) }
-    rule(:drop)    { str('~') >> number.as(:drop) }
-    rule(:keep)    { str('!') >> number.as(:keep) }
-    rule(:reroll)  { str('r') >> number.as(:reroll) }
+    rule(:explode) { str('e') >> number?.as(:explode) >> space? }
+    rule(:drop)    { str('~') >> number.as(:drop) >> space? }
+    rule(:keep)    { str('!') >> number.as(:keep) >> space? }
+    rule(:reroll)  { str('r') >> number.as(:reroll) >> space? }
 
     # This allows options to be defined in any order and
     # even have more than one of the same option, however
@@ -125,7 +119,7 @@ module Dice
 
     def Transform.hashify_options(options)
       opts = {}
-      options.each {|opt, val| opts[opt] = val}
+      options.each {|opt, val| opts[opt] = val} if options.is_a?(Hash)
       return opts
     end
 
@@ -255,7 +249,7 @@ module Dice
       @value  = part
       @count  = part[:count]
       @sides  = part[:sides]
-      @notes  = part[:notes]
+      @notes  = part[:notes] || []
 
       # Our Default Options
       @options = {
@@ -269,7 +263,8 @@ module Dice
     end
 
     def notes
-      return @notes ? @notes.join("\n") : ""
+      return @notes.join("\n") unless @notes.empty?
+      return ""
     end
 
     # Checks to see if this instance has rolled yet
@@ -387,6 +382,19 @@ module Dice
       @result = nil
     end
 
+    def notes
+      s = ""
+
+      self.tree.each do |op, part|
+        if part.is_a?(RollPart)
+          n  = part.notes
+          s += "For: #{part}:\n#{n}\n\n" unless n.empty?
+        end
+      end
+
+      return s
+    end
+
     def result
       self.roll() unless @result
       return @result
@@ -467,6 +475,17 @@ module Dice
       @total    = total
       @sections = sections
     end
+
+    def each(&block)
+      self.sections.each do |section|
+        yield section
+      end
+      return nil
+    end
+
+    def to_s
+      return "#{self.label}: #{self.total}"
+    end
   end
 
   ###
@@ -544,6 +563,7 @@ module Dice
       # Prevent Explosion abuse.
       if xdx[:options].has_key?(:explode)
         explode = xdx[:options][:explode]
+
         if explode.nil? or explode.zero? or explode == 1
           xdx[:options][:explode] = sides
           notes.push("Explode set to #{sides}")
@@ -572,7 +592,7 @@ module Dice
       xdx[:options][:drop] = -(drop)
     end
 
-    xdx[:options][:notes] = notes unless notes.empty?
+    xdx[:notes] = notes unless notes.empty?
 
     return xdx
   end
@@ -588,7 +608,7 @@ module Dice
       
       return normalize_tree(ast)
 
-    rescue Parslet::ParseFailed
+    rescue Parslet::ParseFailed => reason
       # We're merely re-wrapping the error here to 
       # hide implementation from user who doesn't care
       # to read the source.
