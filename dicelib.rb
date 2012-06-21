@@ -255,6 +255,7 @@ module Dice
       @value  = part
       @count  = part[:count]
       @sides  = part[:sides]
+      @notes  = part[:notes]
 
       # Our Default Options
       @options = {
@@ -265,6 +266,10 @@ module Dice
       }
 
       @options.update(part[:options]) if part.has_key?(:options)
+    end
+
+    def notes
+      return @notes ? @notes.join("\n") : ""
     end
 
     # Checks to see if this instance has rolled yet
@@ -516,8 +521,7 @@ module Dice
     end
   end
 
-  # This further massages the xDx hashes. Mostly, 
-  # this now just deletes empty :options values.
+  # This further massages the xDx hashes.
   def self.normalize_xdx(xdx)
     count = xdx[:xdx][:count]
     sides = xdx[:xdx][:sides]
