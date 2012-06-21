@@ -23,51 +23,68 @@
 require 'rubygems'
 require 'parslet'
 
-module DiceLib
+module Dice
 
   DefaultRoll = "1d6"
 
-  DefaultOptions = {
-    :drop    => 0,
-    :keep    => 0,
-    :explode => 0,
-    :reroll  => 0,
-  }
-
+  # This is to limit how many times a die
+  # can explode (aka, 'open ended' roll).
+  # It's set to allow a high enough chance
+  # but set low enough to prevent abuse.
   ExplodeLimit = 20
 
-  class DiceLibError < Exception; end
+  class DiceError < Exception; end
 
   class Parser < Parslet::Parser
 
     # Base rules.
     rule(:space?)  { str(' ').repeat }
-    rule(:number)  { match('[0-9]').repeat(1) }
+
+    # Numbers are limited to 3 digit places. Why?
+    # To prevent abuse from people rolling: 
+    # 999999999D999999999 and 'DOS'-ing the app.
+    rule(:number)  { match('[0-9]').repeat(1,3) }
     rule(:number?) { number.maybe }
 
     # Label rule
+    # Labels must match '(<some text here>)' and
+    # are not allowed to have commas in the label.
+    # This for future use of parsing multiple dice
+    # definitions in comma-separated strings.
+    # The :label matches anything that ISN'T a 
+    # parenethesis or a comma.
     rule(:lparen) { str('(') }
     rule(:rparen) { str(')') }
     rule(:label) do
       lparen >> 
-      match('[^()]').repeat(1).as(:label) >> 
+      match('[^(),]').repeat(1).as(:label) >> 
       rparen >> 
       space?
     end
 
     # count and sides rules.
+    # :count is allowed to be nil, which will default
+    # to 1.
     rule(:count) { number?.as(:count) }
     rule(:sides) { match('[dD]') >> number.as(:sides) }
 
     # xDx Parts.
+    # All xDx parts may be followed by none, one, or more
+    # options.
     rule(:xdx) { (count >> sides).as(:xdx) >> options? }
 
     # xdx Options.
+    # Note that :explode is allowed to NOT have a number
+    # assigned, which will leave it with a nil value.
+    # This is handled in RollPart#initialize.
     rule(:explode) { str('e') >> number?.as(:explode) }
     rule(:drop)    { str('~') >> number.as(:drop) }
     rule(:keep)    { str('!') >> number.as(:keep) }
     rule(:reroll)  { str('r') >> number.as(:reroll) }
 
+    # This allows options to be defined in any order and
+    # even have more than one of the same option, however
+    # only the last option of a given key will be kept.
     rule(:options) { 
       space? >> (drop | explode | keep | reroll).repeat >> space?
     }
@@ -81,7 +98,9 @@ module DiceLib
     rule(:div) { str('/') }
     rule(:op)  { (add | sub | mul | div).as(:op) }
     
-    # Part
+    # Part Rule
+    # A part is an operator, followed by either an xDx
+    # string or a static number value.
     rule(:part)  do
       space?                    >> 
       op                        >> 
@@ -90,8 +109,13 @@ module DiceLib
       space?
     end
 
+    # All parts of a dice roll MUST start with an xDx
+    # string and then followed by any optional parts.
+    # The first xDx string is labeled as :start.
     rule(:parts) { xdx.as(:start) >> part.repeat }
 
+    # A dice string is an optional label, followed by
+    # the defined parts.
     rule(:dice) { label.maybe >> parts  }
 
     root(:dice)
@@ -105,8 +129,10 @@ module DiceLib
       return opts
     end
 
-    # Option transforms. For those in some xdx subtrees,
-    # the Transform.hashify_options method is called.
+    # Option transforms. These are turned into an array of
+    # 2-element arrays ('tagged arrays'), which is then
+    # hashified later. (There is no way to update the 
+    # options when these rules are matched.)
     rule(:drop    => simple(:x)) { [:drop,    Integer(x)] }
     rule(:keep    => simple(:x)) { [:keep,    Integer(x)] }
     rule(:reroll  => simple(:x)) { [:reroll,  Integer(x)] }
@@ -120,10 +146,13 @@ module DiceLib
     # Parts {:ops => (:xdx | :number)}
     # These are first-match, so the simple number will
     # be matched before the xdx subtree.
+
+    # Match an operator followed by a static number.
     rule(:op => simple(:o), :value => simple(:v)) do
-      [String(o), Integer(v)]      
+      [String(o), Integer(v)]
     end
 
+    # Match an operator followed by an :xdx subtree.
     rule(:op => simple(:o), :value => subtree(:part)) do
       [String(o), 
         {
@@ -136,8 +165,10 @@ module DiceLib
       ] 
     end
 
+    # Match a label by itself.
     rule(:label => simple(:s)) { {:label => String(s)} }
 
+    # Match a label followed by a :start subtree.
     rule(:label => simple(:s), :start => subtree(:part)) do
       [
         {:label => String(s)},
@@ -149,6 +180,9 @@ module DiceLib
       ]
     end
 
+    # Match a :start subtree, with the label not present.
+    # Note that this returns a hash, but the final output
+    # will still be in an array.
     rule(:start => subtree(:part)) do
       {:start => {
         :xdx     => part[:xdx],
@@ -157,12 +191,10 @@ module DiceLib
       }
     end
 
-    # We have to match these this way; this is a pain 
-    # in the ass of a match. >:E
+    # Convert the count and sides of an :xdx part.
     rule(:count => simple(:c), :sides => simple(:s)) do
       { :count => Integer(c), :sides => Integer(s) }
     end
-
   end
 
   # The most simplest of a part. If a given part of
@@ -234,6 +266,11 @@ module DiceLib
       if part.has_key?(:options)
         @options.update(part[:options])
 
+        # Negate :drop if it's non-zero, since
+        # in #roll, it's used as a negative index
+        # for an array slice.
+        @options[:drop] = -(@options[:drop]) if @options[:drop] > 0
+
         # Check for nil :explode and set it
         # to @sides.
         @options[:explode] = @sides if @options[:explode].nil?
@@ -278,16 +315,18 @@ module DiceLib
         end
       end
 
+      results.sort!
+      results.reverse!
+
+      # Save the tally in case it's requested later.
       @tally = results.dup()
 
-      results.sort!
-
-      if @options[:drop] > 0
+      # Drop the low end numbers if :drop is less than zero.
+      if @options[:drop] < 0
         results = results[0 ... @options[:drop]]
       end
 
-      results.reverse!
-
+      # Keep the high end numbers if :keep is greater than zero.
       if @options[:keep] > 0
         results = results[0 ... @options[:keep]]
       end
@@ -299,9 +338,9 @@ module DiceLib
     end
 
     # Returns the tally from the roll. This is the entire
-    # tally, even if a :keep or :drop options was given.
-    def tally(do_sort=true)
-      do_sort ?  @tally.dup.sort.reverse() : @tally
+    # tally, even if a :keep or :drop options were given.
+    def tally()
+      return @tally
     end
 
     # Gets the total of the last roll; if there is no 
@@ -328,9 +367,9 @@ module DiceLib
         s += @options[:explode].to_s unless @options[:explode] == self.sides
       end
 
-      s += "#{sp}~" + @options[:drop].to_s   unless @options[:drop].zero?
-      s += "#{sp}!" + @options[:keep].to_s   unless @options[:keep].zero?
-      s += "#{sp}r" + @options[:reroll].to_s unless @options[:reroll].zero?
+      s += "#{sp}~" + @options[:drop].abs.to_s unless @options[:drop].zero?
+      s += "#{sp}!" + @options[:keep].to_s     unless @options[:keep].zero?
+      s += "#{sp}r" + @options[:reroll].to_s   unless @options[:reroll].zero?
 
       return s
     end
@@ -340,13 +379,19 @@ module DiceLib
     end
   end
 
+  # This is the 'main' class of DiceLib. This class
+  # takes the dice string, parses it, and encapsulates
+  # the actual rolling of the dice. If no dice string
+  # is given, it defaults to DefaultRoll.
   class Roll
     attr :dstr
     attr :tree
 
+    alias :parsed :tree
+
     def initialize(dstr=nil)
       @dstr   = dstr ||= DefaultRoll
-      @tree   = DiceLib.parse(dstr)
+      @tree   = Dice.parse(dstr)
       @result = nil
     end
 
@@ -390,8 +435,36 @@ module DiceLib
 
       return @result
     end
+
+    def to_s(with_space=true)
+      s = ""
+
+      sp = with_space ? ' ' : ''
+
+      self.tree.each do |op, value|
+        case op
+        when :label
+          s += "#{value}#{sp}"
+        when :start
+          s += "#{value}#{sp}"
+        when :add
+          s += "+#{sp}#{value}#{sp}"
+        when :sub
+          s += "-#{sp}#{value}#{sp}"
+        when :mul
+          s += "*#{sp}#{value}#{sp}"
+        when :div
+          s += "/#{sp}#{value}#{sp}"
+        end
+      end
+
+      return s.strip
+    end
   end
 
+  # This class merely encapsulates the result,
+  # providing convience methods to access the
+  # results of each section if desired.
   class Result 
     attr_reader :label
     attr_reader :total
@@ -404,8 +477,18 @@ module DiceLib
     end
   end
 
+  ###
+  # Module Methods
+  ###
+
+  # This takes the parsed tree, AFTER it has
+  # been through the Transform class, and massages
+  # the data a bit more, to ease the iteration that
+  # happens in the Roll class. It will convert all
+  # values into the correct *Part class.
   def self.normalize_tree(tree)
     return tree.collect do |part|
+
       case part
       when Hash
         if part.has_key?(:label)
@@ -416,6 +499,10 @@ module DiceLib
         end
 
       when Array
+        # We swap out the strings for symbols.
+        # If the op is not one of the arithimetic 
+        # operators, then the op itself is returned.
+        # (This should only happen on :start arrays.)
         op = case part.first
         when "+" then :add
         when "-" then :sub
@@ -434,48 +521,37 @@ module DiceLib
     end
   end
 
+  # This further massages the xDx hashes. Mostly, 
+  # this now just deletes empty :options values.
   def self.normalize_xdx(xdx)
     if xdx[:options].to_s.strip.empty?
       xdx.delete(:options)
-    else
-      case xdx[:options]
-      when Hash
-        opts = {}
-
-        xdx[:options].each do |opt, value|
-          opts[opt] = value
-        end
-
-        xdx[:options] = opts
-
-      when Array
-        # Seriously, somehow these are not being
-        # transformed from the parsing. No clue why.
-        # This might be fixed now!
-        opts = Transform.hashify_options(xdx[:options])
-        xdx[:options] = opts
-      end
     end
 
     return xdx
   end
 
+  # This is the wrapper for the parse, transform,
+  # and normalize calls. This is called by the Roll
+  # class, but may be called to get the raw returned
+  # array of parsed bits for other purposes.
   def self.parse(dstr="")
     begin
       tree = Parser.new.parse(dstr)
       ast  = Transform.new.apply(tree)
-      ast  = normalize_tree(ast)
+      
+      return normalize_tree(ast)
 
-    rescue Parslet::ParseFailed => reason
+    rescue Parslet::ParseFailed
       # We're merely re-wrapping the error here to 
       # hide implementation from user who doesn't care
       # to read the source.
-      #raise DiceLibError, "Dice Parse Error: #{reason}"
-      STDERR.write("Error: #{reason}\n")
+      raise DiceError, "Dice Parse Error for string: #{dstr}"
     end
   end
 end 
 
+# Ignore this. >.>  Lazy development testing.
 if $0 == __FILE__
   require 'pp'
 
@@ -483,6 +559,7 @@ if $0 == __FILE__
     # Basic rolls.
     '(Damage) 2d10', 
     '4d6!3',
+    '1d100',
     
     # Complex ones!
     '5d6!3e + 4 - 1', 
@@ -492,7 +569,7 @@ if $0 == __FILE__
   dstrs.each do |dstr|
     puts "Trying #{dstr}"
 
-    roll = DiceLib::Roll.new(dstr)
+    roll = Dice::Roll.new(dstr)
     res  = roll.result()
 
     pp roll.tree
