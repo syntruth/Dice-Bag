@@ -90,7 +90,7 @@ module DiceBag
     count = 1 if count.zero? or count.nil?
 
     # Set the :count and :sides keys directly
-    # and get ride of the :xdx sub-hash.
+    # and get rid of the :xdx sub-hash.
     xdx[:count] = count
     xdx[:sides] = sides
     xdx.delete(:xdx)

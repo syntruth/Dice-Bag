@@ -1,3 +1,12 @@
+Changes for Version 3.0.1
+=========================
+* Code clean up.
+
+Changes for Version 3.0
+=======================
+* Totally rewritten to use the Parslet gem. Cleaner code, easier
+  to extend.
+
 Changes for Version 2.5.3
 =========================
 * Changed how Reroll parsing works, slightly. Now, if the reroll value

@@ -1,5 +1,5 @@
-Ruby Dice Lib
-=============
+Dice Bag: The Ruby Dice Rolling Library
+=======================================
 
 **Name   :** Dice Bag Library for Ruby
 
@@ -119,7 +119,8 @@ Using the library is rather straight forward:
 
     require 'dicelib'
 
-    dice   = Dice::Roll.new("(Damage) 2d8 + 5 + 1d6")
+    dstr   = "(Damage) 2d8 + 5 + 1d6"
+    dice   = DiceBag::Roll.new(dstr)
     result = dice.result()
 
     puts result
