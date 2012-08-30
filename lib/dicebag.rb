@@ -18,7 +18,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-# dicelib.rb -- version: 3.0.1
+# dicelib.rb -- version: 3.0.3
 
 require 'parslet'
 
@@ -54,15 +54,16 @@ module DiceBag
         # If the op is not one of the arithimetic 
         # operators, then the op itself is returned.
         # (This should only happen on :start arrays.)
-        op = case part.first
+
+        op  = part.first
+        val = part.last
+
+        op = case op
         when "+" then :add
         when "-" then :sub
         when "*" then :mul
         when "/" then :div
-        else part.first
         end
-
-        val = part.last
         
         # If the value is a hash, it's an :xdx hash.
         # Normalize it.

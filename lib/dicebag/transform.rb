@@ -3,7 +3,7 @@ module DiceBag
 
     def Transform.hashify_options(options)
       opts = {}
-      options.each {|opt, val| opts[opt] = val} unless options.is_a?(Hash)
+      options.each {|opt, val| opts[opt] = val} if options.is_a?(Array)
       return opts
     end
 
