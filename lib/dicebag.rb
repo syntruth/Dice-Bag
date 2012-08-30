@@ -18,7 +18,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-# dicelib.rb -- version: 3.0.4
+# dicelib.rb -- version: 3.0.5
 
 require 'parslet'
 

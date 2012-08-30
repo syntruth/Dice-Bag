@@ -1,3 +1,7 @@
+Changes for Version 3.0.4 and 3.0.5
+===================================
+* More minor, but critical fixes.
+
 Changes for Version 3.0.3
 =========================
 * Fixed a fatal bug in the Transform class in hashify_options.
