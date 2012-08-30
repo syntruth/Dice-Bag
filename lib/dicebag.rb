@@ -18,7 +18,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-# dicelib.rb -- version: 3.0.3
+# dicelib.rb -- version: 3.0.4
 
 require 'parslet'
 
@@ -146,6 +146,10 @@ module DiceBag
     begin
       tree = Parser.new.parse(dstr)
       ast  = Transform.new.apply(tree)
+
+      # Sometimes, we get a hash back, so wrap it as 
+      # a single element array.
+      ast = [ast] unless ast.is_a?(Array)
       
       return normalize_tree(ast)
 
