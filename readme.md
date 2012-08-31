@@ -85,14 +85,14 @@ for this option, the die is rolled again and added to the total. If no
 number is given for this option, it is assumed to be the same as the
 number of sides on the die. Thus, '1d6e' is the same as '1d6e6'.
 
-**~#** - this denotes how many dice to drop from the tally. These dice
-are dropped *before* any dice are kept with !# below. So, '5d6 ~2' 
+**d#** - this denotes how many dice to drop from the tally. These dice
+are dropped *before* any dice are kept with k# below. So, '5d6 d2' 
 means roll five 6-sided dice and drop the lowest 2 values. If the given
 value (combined with how many dice to keep) are greater than the number
 of dice in the xDx string, this value will be reset to 0.
 
-**!#** - this denotes how many dice to keep out of the number of dice
-rolled, keeping the highest values from the roll. Thus, '4d6 !3' means
+**k#** - this denotes how many dice to keep out of the number of dice
+rolled, keeping the highest values from the roll. Thus, '4d6 k3' means
 to roll four 6-sided dice and keep the best 3 values. If the given value
 (combined with how many dice to drop) are greater than the number of dice
 in the xDx string, this value will be reset to 0.

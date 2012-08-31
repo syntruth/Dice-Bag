@@ -1,6 +1,9 @@
 Changes for Version 3.1.0
 =========================
 * Added the 't#' target number option to xDx strings. See the ReadMe file.
+* Changed the ~ (drop) and ! (keep) xDx option sigils to be 'd' and 'k'
+  respectively. This breaks sligtly with tradition, but keeps things a bit
+  more normalized option-sigil-wise. Or something.
 
 Changes for Version 3.0.4 and 3.0.5
 ===================================
