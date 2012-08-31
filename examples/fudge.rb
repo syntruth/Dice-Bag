@@ -23,20 +23,19 @@ module Fudge
       tally = []
 
       super.sections.each do |section|
-        # 1, 2 = -1
-        # 3, 4 =  0
-        # 5, 6 = +1
-        num = case section.total
-        when 1, 2 then -1
-        when 3, 4 then  0
-        when 5, 6 then  1
+        sym = case section.total
+        when 1, 2 then '-'
+        when 3, 4 then ' '
+        when 5, 6 then '+'
         end
 
-        total += num
-        tally.push(num)
+        tally.push(sym)
       end
 
-      @total = total
+      plus  = tally.count {|s| s == '+'}
+      minus = tally.count {|s| s == '-'}
+
+      @total = plus - minus
       @tally = tally.sort.reverse
 
       return self
@@ -50,6 +49,10 @@ module Fudge
     def tally
       self.roll unless @tally
       return @tally
+    end
+
+    def to_s
+      return "#{number}dF"
     end
   end
 end
