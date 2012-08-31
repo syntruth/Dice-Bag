@@ -44,12 +44,13 @@ module DiceBag
     rule(:drop)    { str('~') >> number.as(:drop) >> space? }
     rule(:keep)    { str('!') >> number.as(:keep) >> space? }
     rule(:reroll)  { str('r') >> number.as(:reroll) >> space? }
+    rule(:target)  { str('t') >> number.as(:target) >> space? }
 
     # This allows options to be defined in any order and
     # even have more than one of the same option, however
     # only the last option of a given key will be kept.
     rule(:options) { 
-      space? >> (drop | explode | keep | reroll).repeat >> space?
+      space? >> (drop | explode | keep | reroll | target).repeat >> space?
     }
 
     rule(:options?) { options.maybe.as(:options) }

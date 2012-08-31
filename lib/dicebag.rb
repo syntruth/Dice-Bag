@@ -18,7 +18,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE 
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-# dicelib.rb -- version: 3.0.5
+# dicelib.rb -- version: 3.1.0
 
 require 'parslet'
 
@@ -131,6 +131,18 @@ module DiceBag
 
       # Negate :drop. See why in RollPart#roll.
       xdx[:options][:drop] = -(drop)
+
+      # Finally, if we have a target number, make sure it is equal
+      # to or less than the dice sides and greater than 0, otherwise, 
+      # set it to 0 (aka no target number) and add a note.
+      if xdx[:options].has_key?(:target)
+        target = xdx[:options][:target]
+
+        if target > sides or target < 0
+          xdx[:options][:target] = 0
+          notes.push("Target number too large; reset to 0.")
+        end
+      end
     end
 
     xdx[:notes] = notes unless notes.empty?

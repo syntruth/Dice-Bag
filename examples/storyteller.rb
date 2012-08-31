@@ -7,30 +7,26 @@ require 'dicebag'
 module Storyteller
   class Pool < DiceBag::Roll
     def initialize(number=1, success=8)
-      @number    = number
-      @success   = success
-      @successes = nil
-      @tally     = nil
+      @number  = number
+      @success = success
+      @result  = nil
 
-      super("#{number}d10e")
+      super("#{number}d10e t#{success}")
     end
 
     def roll
-      @result    = super()
-      @tally     = @result.sections.first.tally
-      @successes = @tally.count {|r| r >= @success}
-
-      return self
+      @result = super()
+      return @result
     end
 
     def successes
-      self.roll unless @successes
-      return @successes
+      self.roll unless @result
+      return @result.total
     end
 
     def tally
-      self.roll unless @tally
-      return @tally
+      self.roll unless @result
+      return @result.sections[0].tally
     end
 
     def to_s

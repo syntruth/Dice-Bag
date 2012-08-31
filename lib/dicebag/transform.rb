@@ -11,9 +11,10 @@ module DiceBag
     # 2-element arrays ('tagged arrays'), which is then
     # hashified later. (There is no way to update the 
     # options when these rules are matched.)
-    rule(:drop    => simple(:x)) { [:drop,    Integer(x)] }
-    rule(:keep    => simple(:x)) { [:keep,    Integer(x)] }
-    rule(:reroll  => simple(:x)) { [:reroll,  Integer(x)] }
+    rule(:drop    => simple(:x)) { [:drop,   Integer(x)] }
+    rule(:keep    => simple(:x)) { [:keep,   Integer(x)] }
+    rule(:reroll  => simple(:x)) { [:reroll, Integer(x)] }
+    rule(:target  => simple(:x)) { [:target, Integer(x)] }
     
     # Explode is special, in that if it is nil, then it
     # must remain that way.

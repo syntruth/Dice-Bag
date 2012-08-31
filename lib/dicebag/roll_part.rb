@@ -20,7 +20,8 @@ module DiceBag
         :explode => 0,
         :drop    => 0,
         :keep    => 0,
-        :reroll  => 0
+        :reroll  => 0,
+        :target  => 0
       }
 
       @options.update(part[:options]) if part.has_key?(:options)
@@ -82,8 +83,15 @@ module DiceBag
         results = results[0 ... @options[:keep]]
       end
 
-      # I think reduce(:+) is ugly, but it's very fast.
-      @total = results.reduce(:+)
+      # If we have a target number, count how many rolls
+      # in the tally are >= than this number, otherwise
+      # we just add up all the numbers.
+      if @options[:target] and @options[:target] > 0
+        @total = results.count {|r| r >= @options[:target]}
+      else
+        # I think reduce(:+) is ugly, but it's very fast.
+        @total = results.reduce(:+)
+      end
 
       return self
     end
@@ -118,6 +126,7 @@ module DiceBag
         s += @options[:explode].to_s unless @options[:explode] == self.sides
       end
 
+      s += "#{sp}t" + @options[:target].to_s   unless @options[:target].zero?
       s += "#{sp}~" + @options[:drop].abs.to_s unless @options[:drop].zero?
       s += "#{sp}!" + @options[:keep].to_s     unless @options[:keep].zero?
       s += "#{sp}r" + @options[:reroll].to_s   unless @options[:reroll].zero?

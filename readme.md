@@ -102,6 +102,15 @@ less, then the die is rolled again. Thus, '1d6r3' will only return a
 result of 4, 5, or 6. If the given value is larger than the number of
 sides on the die, then it is reset to 0.
 
+**t#** - this denotes a target number that each die in the roll must
+match or exceed to count as a 'success'. That is, the dice in the roll
+are *not* added together for a total, but any die that meets or exceeds
+the target number is added to a total of successes. For example, '5d10
+t8' means roll five 10-sided dice and each die that is 8 or higher is a
+success. (Like in WhiteWolf games.) If this option is given a 0 value,
+that is the same as not having the option at all; that is, a normal sum
+of all dice in the roll is performed instead.
+
 Note: if any value is reset because of a validation failure, a note is
 attached to the Roll.
 

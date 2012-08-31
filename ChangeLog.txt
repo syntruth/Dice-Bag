@@ -1,3 +1,7 @@
+Changes for Version 3.1.0
+=========================
+* Added the 't#' target number option to xDx strings. See the ReadMe file.
+
 Changes for Version 3.0.4 and 3.0.5
 ===================================
 * More minor, but critical fixes.
