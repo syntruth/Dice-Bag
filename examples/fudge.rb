@@ -52,7 +52,7 @@ module Fudge
     end
 
     def to_s
-      return "#{number}dF"
+      return "#{@number}dF"
     end
   end
 end

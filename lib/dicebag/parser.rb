@@ -41,8 +41,8 @@ module DiceBag
     # assigned, which will leave it with a nil value.
     # This is handled in RollPart#initialize.
     rule(:explode) { str('e') >> number?.as(:explode) >> space? }
-    rule(:drop)    { str('~') >> number.as(:drop) >> space? }
-    rule(:keep)    { str('!') >> number.as(:keep) >> space? }
+    rule(:drop)    { str('d') >> number.as(:drop) >> space? }
+    rule(:keep)    { str('k') >> number.as(:keep) >> space? }
     rule(:reroll)  { str('r') >> number.as(:reroll) >> space? }
     rule(:target)  { str('t') >> number.as(:target) >> space? }
 

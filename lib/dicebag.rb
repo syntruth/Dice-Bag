@@ -140,7 +140,7 @@ module DiceBag
 
         if target > sides or target < 0
           xdx[:options][:target] = 0
-          notes.push("Target number too large; reset to 0.")
+          notes.push("Target number too large or is negative; reset to 0.")
         end
       end
     end
