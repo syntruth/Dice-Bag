@@ -126,10 +126,10 @@ module DiceBag
         s += @options[:explode].to_s unless @options[:explode] == self.sides
       end
 
-      s += "#{sp}t" + @options[:target].to_s   unless @options[:target].zero?
-      s += "#{sp}~" + @options[:drop].abs.to_s unless @options[:drop].zero?
-      s += "#{sp}!" + @options[:keep].to_s     unless @options[:keep].zero?
+      s += "#{sp}d" + @options[:drop].abs.to_s unless @options[:drop].zero?
+      s += "#{sp}k" + @options[:keep].to_s     unless @options[:keep].zero?
       s += "#{sp}r" + @options[:reroll].to_s   unless @options[:reroll].zero?
+      s += "#{sp}t" + @options[:target].to_s   unless @options[:target].zero?
 
       return s
     end

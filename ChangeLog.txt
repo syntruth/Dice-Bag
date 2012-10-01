@@ -1,3 +1,8 @@
+Changes for Version 3.1.1
+=========================
+* Updated RollPart#to_s to reflect xDx option strings. It was still using
+  older ~ and ! for drop and keep options.
+
 Changes for Version 3.1.0
 =========================
 * Added the 't#' target number option to xDx strings. See the ReadMe file.

@@ -55,4 +55,6 @@ module Fudge
       return "#{@number}dF"
     end
   end
+
+  DF = Roll.new
 end
