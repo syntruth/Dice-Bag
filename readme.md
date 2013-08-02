@@ -126,7 +126,7 @@ Using the Dice Library
 
 Using the library is rather straight forward:
 
-    require 'dicelib'
+    require 'dicebag'
 
     dstr   = "(Damage) 2d8 + 5 + 1d6"
     dice   = DiceBag::Roll.new(dstr)
