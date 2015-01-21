@@ -4,18 +4,18 @@ module DiceBag
   # it will be an instance of this class, which simply
   # returns the value given to it.
   class SimplePart
-    attr :value
+    attr_reader :value
 
     def initialize(part)
       @value = part
     end
 
     def result
-      return @value
+      value
     end
 
     def to_s
-      return @value
+      value
     end
   end
 end

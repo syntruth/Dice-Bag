@@ -1,3 +1,10 @@
+Changes for Version 3.1.2
+=========================
+* General code clean up and some refactoring.
+* Added roll_part_string.rb and roll_string.rb to modularize the #to_s
+  methods for the RollPart and Roll classes. Part of the above clean up
+  and refactoring.
+
 Changes for Version 3.1.1
 =========================
 * Updated RollPart#to_s to reflect xDx option strings. It was still using

@@ -1,14 +1,18 @@
+# Encoding: UTF-8
+
 require 'rubygems'
 require 'dicebag'
 
 module DiceBag
+  # Models a set of Savage Worlds dice types.
   module SavageWorlds
-
+    # Models a single Savage World die, with
+    # attributes for max and half values.
     class SWDie < Roll
       attr_reader :maximum
       attr_reader :half
 
-      def initialize(sides, mod=0)
+      def initialize(sides, mod = 0)
         @maximum = sides
         @half    = (sides / 2) + (mod / 2)
 
@@ -28,4 +32,3 @@ module DiceBag
     WildDieNoTrait = SWDie.new(6, -2)
   end
 end
-

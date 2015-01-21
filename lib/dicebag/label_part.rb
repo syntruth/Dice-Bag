@@ -1,9 +1,10 @@
+# Encoding: UTF-8
+
 module DiceBag
   # The subclass for a label.
   class LabelPart < SimplePart
     def to_s
-      return "(%s)" % self.value
+      format('(%s)', value)
     end
   end
-
 end

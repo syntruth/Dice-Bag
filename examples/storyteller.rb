@@ -1,12 +1,15 @@
-# This is actually modeling the "Storytelling" system dice, not the older
-# "Storyteller" system dice, but I personally find "Storytelling" kind of a 
-# silly name; prefer the older name. :D
+# Encoding: UTF-8
+
 require 'rubygems'
 require 'dicebag'
 
+# This is actually modeling the "Storytelling" system dice, not the older
+# "Storyteller" system dice, but I personally find "Storytelling" kind of a
+# silly name; prefer the older name. :D
 module Storyteller
+  # This is a models a pool of Storyteller dice.
   class Pool < DiceBag::Roll
-    def initialize(number=1, success=8)
+    def initialize(number = 1, success = 8)
       @number  = number
       @success = success
       @result  = nil
@@ -15,22 +18,23 @@ module Storyteller
     end
 
     def roll
-      @result = super()
-      return @result
+      @result = super
     end
 
     def successes
-      self.roll unless @result
-      return @result.total
+      roll unless @result
+
+      @result.total
     end
 
     def tally
-      self.roll unless @result
-      return @result.sections[0].tally
+      roll unless @result
+
+      @result.sections[0].tally
     end
 
     def to_s
-      return "#{@number}d10/#{@success}"
+      "#{@number}d10/#{@success}"
     end
   end
 

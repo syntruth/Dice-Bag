@@ -1,98 +1,79 @@
+# Encoding: UTF-8
+
 module DiceBag
   # This is the 'main' class of Dice Bag. This class
   # takes the dice string, parses it, and encapsulates
   # the actual rolling of the dice. If no dice string
   # is given, it defaults to DefaultRoll.
   class Roll
-    attr :dstr
-    attr :tree
+    include RollString
 
-    alias :parsed :tree
+    attr_reader :dstr
+    attr_reader :tree
 
-    def initialize(dstr=nil)
+    alias_method :parsed, :tree
+
+    def initialize(dstr = nil)
       @dstr   = dstr ||= DefaultRoll
       @tree   = DiceBag.parse(dstr)
       @result = nil
     end
 
     def notes
-      s = ""
+      str = ''
 
-      self.tree.each do |op, part|
-        if part.is_a?(RollPart)
-          n  = part.notes
-          s += "For: #{part}:\n#{n}\n\n" unless n.empty?
-        end
+      tree.each do |_op, part|
+        next unless part.is_a?(RollPart)
+
+        pn   = part.notes
+        str += format('For: %s\n%s\n\n', part, pn) unless pn.empty?
       end
 
-      return s
+      str
     end
 
     def result
-      self.roll() unless @result
-      return @result
+      roll unless @result
+
+      @result
     end
 
     def roll
-      total    = 0
-      label    = ""
-      sections = []
-    
-      self.tree.each do |op, part|
-        do_push = true
- 
-        # If this is a RollPart instance,
-        # ensure fresh results.
-        part.roll() if part.is_a?(RollPart)
+      @label = ''
+      @total = 0
 
-        case op
-        when :label
-          label   = part.value()
-          do_push = false
-        when :start
-          total = part.total()
-        when :add
-          total += part.total()
-        when :sub
-          total -= part.total()
-        when :mul
-          total *= part.total()
-        when :div
-          total /= part.total()
-        end
+      handle_tree
 
-        sections.push(part) if do_push
-      end
-
-      @result = Result.new(label, total, sections)
-
-      return @result
+      @result = Result.new(@label, @total, @sections)
     end
 
-    def to_s(with_space=true)
-      s = ""
+    private
 
-      sp = with_space ? ' ' : ''
-
-      self.tree.each do |op, value|
-        case op
-        when :label
-          s += "#{value}#{sp}"
-        when :start
-          s += "#{value}#{sp}"
-        when :add
-          s += "+#{sp}#{value}#{sp}"
-        when :sub
-          s += "-#{sp}#{value}#{sp}"
-        when :mul
-          s += "*#{sp}#{value}#{sp}"
-        when :div
-          s += "/#{sp}#{value}#{sp}"
+    def handle_tree
+      tree.each do |op, part|
+        if op == :label
+          @label = part.value
+          next
         end
+
+        part.roll if part.is_a?(RollPart) # ensure fresh results.
+
+        handle_op op, part
+      end
+    end
+
+    def handle_op(op, part)
+      @sections = []
+
+      case op
+      when :start then @total  = part.total
+      when :add   then @total += part.total
+      when :sub   then @total -= part.total
+      when :mul   then @total *= part.total
+      when :div   then @total /= part.total
       end
 
-      return s.strip
+      @sections.push part
     end
   end
-
 end

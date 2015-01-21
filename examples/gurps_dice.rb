@@ -1,36 +1,46 @@
+# Encoding: UTF-8
+
 require 'rubygems'
 require 'dicebag'
 
+# This models the standard GURPS 3d6 dice
+# pool used for attribute/skill tests.
 class GURPSDice < DiceBag::Roll
   def initialize
     super('3d6')
   end
 
-  def roll(target, mod=0)
+  def roll(target, mod = 0)
     mod = 0 unless mod.is_a?(Fixnum)
 
-    total_target = target + mod
+    @total_target = target + mod
+    @total        = super.total
 
-    crit_success = [3, 4]
-    crit_failure = [18]
+    figure_success
+    figure_failure
 
-    crit_success.push(5)  if total_target >= 15
-    crit_success.push(6)  if total_target >= 16
-    crit_failure.push(17) if total_target <= 15
+    [figure_result, @total]
+  end
 
-    result = super()
-    total  = result.total()
+  private
 
-    success = if crit_success.include?(total)
-      :critical_success
-    elsif crit_failure.include?(total)
-      :critical_failure
-    elsif total <= total_target
-      :success
-    else
-      :failure
-    end
+  def figure_success
+    @crit_success = [3, 4]
 
-    return [success, total]
+    @crit_success.push(5) if @total_target >= 15
+    @crit_success.push(6) if @total_target >= 16
+  end
+
+  def figure_failure
+    @crit_failure = [18]
+
+    @crit_failure.push(17) if @total_target <= 15
+  end
+
+  def figure_result
+    return :critical_success if @crit_success.include?(@total)
+    return :critical_failure if @crit_failure.include?(@total)
+
+    (@total <= @total_target) ? :success : :failure
   end
 end
