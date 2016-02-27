@@ -10,7 +10,7 @@ Dice Bag: The Ruby Dice Rolling Library
 **License:** LGPL OR MIT
 
 The dice library for Ruby is an attempt to bring a standard interface
-to every gamer's (RPG and otherwise) need to have dice rolled. The 
+to every gamer's (RPG and otherwise) need to have dice rolled. The
 centralized concept to this is taking a standard formatted string and
 parsing it, returning values from that string.
 
@@ -25,7 +25,7 @@ so it's been removed to keep this newer version (3.0+) cleaner.
 
 Starting with Version 3.0, this library now uses parslet, the excellent
 Ruby syntax parser. It's made the internals a *bit* more complicated,
-but has allowed greater flexibility in constructing dice strings. For 
+but has allowed greater flexibility in constructing dice strings. For
 example, previous version, you had to do '4d6 e6 !3' if you wanted the
 dice to explode (see below) and to keep the 3 highest rolls. Now, the
 e6 and !3 (and the other options) can be in any order after the xDx
@@ -43,7 +43,7 @@ Dice Strings
 **Simple Dice String**
 
 A simple dice string, also called the xDx string, that represents a
-single group of dice, such as 3d10 or 4d6. Optional parts of the 
+single group of dice, such as 3d10 or 4d6. Optional parts of the
 Simple Dice string are given below.
 
 A dice string is made up of one or more parts that consist of either:
@@ -56,7 +56,7 @@ A dice string is made up of one or more parts that consist of either:
 
 The allowed static modifiers are add (+), subtract (-), multiply (\*),
 and divide (/). As the library (in the Roll class) iterates over the
-parsed tree, a total for that roll is kept; the static modifiers are 
+parsed tree, a total for that roll is kept; the static modifiers are
 applied *in the order they are gotten*, which is to say, the standard
 order of arithmetic calculations do not apply.
 
@@ -76,7 +76,7 @@ In the following section, note that # is used to denote the number
 part of a option.
 
 **xDx** - denotes how many dice to roll and how many sides the dice
-should have. This is the standard RPG dice syntax. This *must* come 
+should have. This is the standard RPG dice syntax. This *must* come
 before any options for a given set of dice.
 
 **e#** - the explode value. Some game systems call this 'open ended'
@@ -86,7 +86,7 @@ number is given for this option, it is assumed to be the same as the
 number of sides on the die. Thus, '1d6e' is the same as '1d6e6'.
 
 **d#** - this denotes how many dice to drop from the tally. These dice
-are dropped *before* any dice are kept with k# below. So, '5d6 d2' 
+are dropped *before* any dice are kept with k# below. So, '5d6 d2'
 means roll five 6-sided dice and drop the lowest 2 values. If the given
 value (combined with how many dice to keep) are greater than the number
 of dice in the xDx string, this value will be reset to 0.
@@ -97,8 +97,8 @@ to roll four 6-sided dice and keep the best 3 values. If the given value
 (combined with how many dice to drop) are greater than the number of dice
 in the xDx string, this value will be reset to 0.
 
-**r#** - this denotes a reroll value. If the die rolls this value or 
-less, then the die is rolled again. Thus, '1d6r3' will only return a 
+**r#** - this denotes a reroll value. If the die rolls this value or
+less, then the die is rolled again. Thus, '1d6r3' will only return a
 result of 4, 5, or 6. If the given value is larger than the number of
 sides on the die, then it is reset to 0.
 
@@ -118,7 +118,7 @@ Dice String Limitations
 -----------------------
 
 Within the dice library itself, simple (xDx) strings are limited to 3
-digits for all parts of the string. This is to prevent honkin' huge 
+digits for all parts of the string. This is to prevent honkin' huge
 numbers that *some* users abuse to lag out the dice rolling process.
 
 Using the Dice Library
@@ -126,7 +126,7 @@ Using the Dice Library
 
 Using the library is rather straight forward:
 
-    require 'dicelib'
+    require 'dicebag'
 
     dstr   = "(Damage) 2d8 + 5 + 1d6"
     dice   = DiceBag::Roll.new(dstr)
@@ -140,7 +140,7 @@ This would output something like the following:
 
 The returned result from Roll#result is an instance of the Result
 class, which has methods to access the label (if any), the total of
-the roll, and also each of the sections that made up the roll. 
+the roll, and also each of the sections that made up the roll.
 
 It is possible to get the individual sections values as well:
 
@@ -154,7 +154,7 @@ For the above given dice string, would print something like this:
       5: 5
     1d6: 3
 
-Also, if you are curious to see how the dice string was parsed, you can 
+Also, if you are curious to see how the dice string was parsed, you can
 retrieved the parsed value from the Roll instance using the tree() method:
 
     parsed = dice.tree()
