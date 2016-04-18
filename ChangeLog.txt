@@ -1,3 +1,9 @@
+Changes for Version 3.2
+* TESTS! Which needed to be done long ago. Really, no exuse. Bad, Syntruth,
+  bad!
+* BUG FIXES! Because of tests. Also, long overdue. Some really stupid bugs in
+  there.
+
 Changes for Version 3.1.2
 =========================
 * General code clean up and some refactoring.

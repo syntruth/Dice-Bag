@@ -18,13 +18,13 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-# dicelib.rb -- version: 3.1.0
+# dicelib.rb -- version: 3.2.0
 
 require 'parslet'
 
 # This defined the main DiceBag module.
 module DiceBag
-  DEFAULT_ROLL = '1d6'
+  DEFAULT_ROLL = '1d6'.freeze
 
   # This is our generic DiceBagError
   # exception subclass.
@@ -83,12 +83,8 @@ module DiceBag
     end
   end
 
-  def self.normalize_value(value)
-    if value.is_a?(Hash)
-      RollPart.new normalize_xdx(value)
-    else
-      StaticPart.new value
-    end
+  def self.normalize_value(val)
+    val.is_a?(Hash) ? RollPart.new(normalize_xdx(val)) : StaticPart.new(val)
   end
 
   # This further massages the xDx hashes.
@@ -126,20 +122,22 @@ module DiceBag
 
   # Prevent Explosion abuse.
   def self.normalize_explode(xdx)
-    if xdx[:options].key?(:explode)
-      explode = xdx[:options][:explode]
+    return unless xdx[:options].key? :explode
 
-      if explode.nil? || explode.zero? || explode == 1
-        xdx[:options][:explode] = sides
+    explode = xdx[:options][:explode]
 
-        xdx[:notes].push("Explode set to #{sides}")
-      end
+    if explode.nil? || explode.zero? || explode == 1
+      xdx[:options][:explode] = xdx[:sides]
+
+      xdx[:notes].push("Explode set to #{xdx[:sides]}")
     end
   end
 
   # Prevent Reroll abuse.
   def self.normalize_reroll(xdx)
-    if xdx[:options].key?(:reroll) && xdx[:options][:reroll] >= sides
+    return unless xdx[:options].key? :reroll
+
+    if xdx[:options][:reroll] >= xdx[:sides]
       xdx[:options][:reroll] = 0
 
       xdx[:notes].push 'Reroll reset to 0.'
@@ -150,8 +148,8 @@ module DiceBag
   # handle both Drop and Keep values.
   # If not, both are reset to 0. Harsh.
   def self.normalize_drop_keep(xdx)
-    drop = xdx[:options].fetch(:drop) { 0 }
-    keep = xdx[:options].fetch(:keep) { 0 }
+    drop = xdx[:options].fetch(:drop, 0)
+    keep = xdx[:options].fetch(:keep, 0)
 
     if (drop + keep) >= xdx[:count]
       xdx[:options][:drop] = 0
@@ -165,15 +163,15 @@ module DiceBag
   # to or less than the dice sides and greater than 0, otherwise,
   # set it to 0 (aka no target number) and add a note.
   def self.normalize_target(xdx)
-    if xdx[:options].key? :target
-      target = xdx[:options][:target]
+    return unless xdx[:options].key? :target
 
-      if target > sides || target < 0
-        xdx[:options][:target] = 0
+    target = xdx[:options][:target]
 
-        xdx[:notes].push 'Target number too large or is negative; reset to 0.'
-      end
-    end
+    return if target >= 0 && target <= xdx[:sides]
+
+    xdx[:options][:target] = 0
+
+    xdx[:notes].push 'Target number too large or is negative; reset to 0.'
   end
 
   # This is the wrapper for the parse, transform,
@@ -184,29 +182,18 @@ module DiceBag
     tree = Parser.new.parse(dstr)
     ast  = Transform.new.apply(tree)
 
-    # Sometimes, we get a hash back, so wrap it as
-    # a single element array.
-    ast = [ast] unless ast.is_a?(Array)
-
-    return normalize_tree(ast)
-
-  rescue Parslet::ParseFailed
-    # We're merely re-wrapping the error here to
-    # hide implementation from user who doesn't care
-    # to read the source.
-    raise DiceBagError, "Dice Parse Error for string: #{dstr}"
+    normalize_tree ast
   end
 end
 
-# Our #to_s modules
-require 'dicebag/roll_string'
-require 'dicebag/roll_part_string'
-
-require 'dicebag/parser'
-require 'dicebag/transform'
-require 'dicebag/simple_part'
-require 'dicebag/label_part'
-require 'dicebag/static_part'
-require 'dicebag/roll_part'
-require 'dicebag/roll'
-require 'dicebag/result'
+# Our sub-modules.
+require_relative './dicebag/roll_string'
+require_relative './dicebag/roll_part_string'
+require_relative './dicebag/parser'
+require_relative './dicebag/transform'
+require_relative './dicebag/simple_part'
+require_relative './dicebag/label_part'
+require_relative './dicebag/static_part'
+require_relative './dicebag/roll_part'
+require_relative './dicebag/roll'
+require_relative './dicebag/result'

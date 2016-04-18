@@ -5,6 +5,16 @@ module DiceBag
   # components. To understand this code, please refer to
   # the Parslet library's documentation.
   class Parser < Parslet::Parser
+    # We override the #parse method, so that we can
+    # assure that we always return an Array.
+    def parse(dstr)
+      result = super dstr
+
+      result = [result] unless result.is_a? Array
+
+      result
+    end
+
     # Base rules.
     rule(:space?)  { str(' ').repeat }
 
@@ -85,7 +95,7 @@ module DiceBag
 
     # A dice string is an optional label, followed by
     # the defined parts.
-    rule(:dice) { label.maybe >> parts  }
+    rule(:dice) { label.maybe >> parts }
 
     root(:dice)
   end

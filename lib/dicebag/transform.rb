@@ -34,18 +34,25 @@ module DiceBag
     # be matched before the xdx subtree.
 
     # Match an operator followed by a static number.
+    # TODO: find out why this is not matching simple
+    # op => integers! -- 2016-04-18
     rule(op: simple(:o), value: simple(:v)) do
       [String(o), Integer(v)]
     end
 
     # Match an operator followed by an :xdx subtree.
-    rule(op: simple(:op), value: subtree(:part)) do
-      op      = String(op)
-      count   = Integer(part[:xdx][:count])
-      sides   = Integer(part[:xdx][:sides])
-      options = Transform.hashify_options(part[:options])
+    rule(op: simple(:o), value: subtree(:part)) do
+      value = if part.is_a? Hash
+                count   = Integer(part[:xdx][:count])
+                sides   = Integer(part[:xdx][:sides])
+                options = Transform.hashify_options(part[:options])
 
-      [op, { xdx: { count: count, sides: sides }, options: options }]
+                { xdx: { count: count, sides: sides }, options: options }
+              else
+                Integer(part)
+              end
+
+      [String(o), value]
     end
 
     # Match a label by itself.

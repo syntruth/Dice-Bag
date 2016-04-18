@@ -104,7 +104,7 @@ module DiceBag
       # Note that we invert the drop value here.
       range = 0...-(@options[:drop])
 
-      @results.slice!(range)
+      @results = @results.slice range
     end
 
     def handle_keep
@@ -112,19 +112,19 @@ module DiceBag
 
       range = 0...@options[:keep]
 
-      @results.slice!(range)
+      @results = @results.slice range
     end
 
     def handle_total
       # If we have a target number, count how many rolls
       # in the results are >= than this number, otherwise
       # we just add up all the numbers.
-      if @options[:target] && @options[:target] > 0
-        @total = @results.count { |r| r >= @options[:target] }
-      else
-        # I think reduce(:+) is ugly, but it's very fast.
-        @total = @results.reduce(:+)
-      end
+      @total = if @options[:target] && @options[:target] > 0
+                 @results.count { |r| r >= @options[:target] }
+               else
+                 # I think reduce(:+) is ugly, but it's very fast.
+                 @results.reduce(:+)
+               end
     end
   end
 end

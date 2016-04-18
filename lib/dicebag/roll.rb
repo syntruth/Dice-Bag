@@ -11,11 +11,11 @@ module DiceBag
     attr_reader :dstr
     attr_reader :tree
 
-    alias_method :parsed, :tree
+    alias parsed tree
 
     def initialize(dstr = nil)
-      @dstr   = dstr ||= DefaultRoll
-      @tree   = DiceBag.parse(dstr)
+      @dstr   = dstr ||= DEFAULT_ROLL
+      @tree   = DiceBag.parse dstr
       @result = nil
     end
 
@@ -23,10 +23,9 @@ module DiceBag
       str = ''
 
       tree.each do |_op, part|
-        next unless part.is_a?(RollPart)
+        next unless part.is_a?(RollPart) || !part.notes.empty?
 
-        pn   = part.notes
-        str += format('For: %s\n%s\n\n', part, pn) unless pn.empty?
+        str += format('For: %s\n%s\n\n', part, part.notes)
       end
 
       str
@@ -39,8 +38,9 @@ module DiceBag
     end
 
     def roll
-      @label = ''
-      @total = 0
+      @label    = ''
+      @total    = 0
+      @sections = []
 
       handle_tree
 
@@ -63,8 +63,6 @@ module DiceBag
     end
 
     def handle_op(op, part)
-      @sections = []
-
       case op
       when :start then @total  = part.total
       when :add   then @total += part.total

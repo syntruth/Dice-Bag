@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'dicebag'
-  s.version     = '3.1.2'
-  s.date        = '2012-06-21'
+  s.version     = '3.2.0'
+  s.date        = '2016-04-18'
   s.summary     = 'Dice Bag: Ruby Dice Rolling Library'
   s.description = 'A very flexible dice rolling library for Ruby.'
   s.authors     = ['SynTruth']
