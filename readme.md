@@ -5,7 +5,7 @@ Dice Bag: The Ruby Dice Rolling Library
 
 **Author :** Randy Carnahan
 
-**Version:** 3.1.2
+**Version:** 3.2.0
 
 **License:** LGPL OR MIT
 
@@ -14,8 +14,8 @@ to every gamer's (RPG and otherwise) need to have dice rolled. The
 centralized concept to this is taking a standard formatted string and
 parsing it, returning values from that string.
 
-The original version of this library was the 'rolldice' Unix
-command-line application. Since this, it's been added to to allow
+The original inspiration for this library was the 'rolldice' Unix
+command-line application. Since then, it's been added to to allow
 additional elements in the dice string.
 
 Note: prior versions of this library allowed for dice strings to be
@@ -26,9 +26,9 @@ so it's been removed to keep this newer version (3.0+) cleaner.
 Starting with Version 3.0, this library now uses parslet, the excellent
 Ruby syntax parser. It's made the internals a *bit* more complicated,
 but has allowed greater flexibility in constructing dice strings. For
-example, previous version, you had to do '4d6 e6 !3' if you wanted the
+example, previous version, you had to do '4d6 e6 k3' if you wanted the
 dice to explode (see below) and to keep the 3 highest rolls. Now, the
-e6 and !3 (and the other options) can be in any order after the xDx
+e6 and k3 (and the other options) can be in any order after the xDx
 part of the string.
 
 Installation
@@ -83,7 +83,7 @@ before any options for a given set of dice.
 dice. If the number rolled is greater than or equal to the value given
 for this option, the die is rolled again and added to the total. If no
 number is given for this option, it is assumed to be the same as the
-number of sides on the die. Thus, '1d6e' is the same as '1d6e6'.
+number of sides on the die. Thus, '1d6 e' is the same as '1d6 e6'.
 
 **d#** - this denotes how many dice to drop from the tally. These dice
 are dropped *before* any dice are kept with k# below. So, '5d6 d2'
@@ -98,7 +98,7 @@ to roll four 6-sided dice and keep the best 3 values. If the given value
 in the xDx string, this value will be reset to 0.
 
 **r#** - this denotes a reroll value. If the die rolls this value or
-less, then the die is rolled again. Thus, '1d6r3' will only return a
+less, then the die is rolled again. Thus, '1d6 r3' will only return a
 result of 4, 5, or 6. If the given value is larger than the number of
 sides on the die, then it is reset to 0.
 
@@ -126,27 +126,33 @@ Using the Dice Library
 
 Using the library is rather straight forward:
 
-    require 'dicebag'
+```ruby
+require 'dicebag'
 
-    dstr   = "(Damage) 2d8 + 5 + 1d6"
-    dice   = DiceBag::Roll.new(dstr)
-    result = dice.result()
+dstr   = "(Damage) 2d8 + 5 + 1d6"
+dice   = DiceBag::Roll.new(dstr)
+result = dice.result()
 
-    puts result
+puts result
+```
 
 This would output something like the following:
 
-    Damage: 15
+```
+Damage: 15
+```
 
-The returned result from Roll#result is an instance of the Result
+The returned result from `Roll#result` is an instance of the `Result`
 class, which has methods to access the label (if any), the total of
 the roll, and also each of the sections that made up the roll.
 
 It is possible to get the individual sections values as well:
 
-    result.each do |section|
-      puts "%s: %s" % [section, section.total]
-    end
+```ruby
+result.each do |section|
+  puts "%s: %s" % [section, section.total]
+end
+```
 
 For the above given dice string, would print something like this:
 
@@ -155,45 +161,50 @@ For the above given dice string, would print something like this:
     1d6: 3
 
 Also, if you are curious to see how the dice string was parsed, you can
-retrieved the parsed value from the Roll instance using the tree() method:
+retrieved the parsed value from the `Roll` instance using the `#tree` method:
 
-    parsed = dice.tree()
+```ruby
+parsed = dice.tree()
+```
 
 For the above given dice string, this returns a nested array of values:
 
-    [[:label, #<Dice::LabelPart:0x1091f2980 @value="Damage"],
-    [:start,
-      #<Dice::RollPart:0x1091f2840
-        @count=2,
-        @notes=[],
-        @options={:keep=>0, :reroll=>0, :explode=>0, :drop=>0},
-        @sides=8,
-        @tally=[5, 2],
-        @total=7,
-        @value={:sides=>8, :count=>2}>],
-    [:add, #<Dice::StaticPart:0x1091f2750 @value=5>],
-    [:add,
-      #<Dice::RollPart:0x1091f2688
-        @count=1,
-        @notes=[],
-        @options={:keep=>0, :reroll=>0, :explode=>0, :drop=>0},
-        @sides=6,
-        @tally=[3],
-        @total=3,
-        @value={:sides=>6, :count=>1}>]]
+```ruby
+[[:label, #<Dice::LabelPart:0x1091f2980 @value="Damage"],
+[:start,
+  #<Dice::RollPart:0x1091f2840
+    @count=2,
+    @notes=[],
+    @options={:keep=>0, :reroll=>0, :explode=>0, :drop=>0},
+    @sides=8,
+    @tally=[5, 2],
+    @total=7,
+    @value={:sides=>8, :count=>2}>],
+[:add, #<Dice::StaticPart:0x1091f2750 @value=5>],
+[:add,
+  #<Dice::RollPart:0x1091f2688
+    @count=1,
+    @notes=[],
+    @options={:keep=>0, :reroll=>0, :explode=>0, :drop=>0},
+    @sides=6,
+    @tally=[3],
+    @total=3,
+    @value={:sides=>6, :count=>1}>]]
+```
 
 Typically, you won't have to deal with the internals of a dice roll if all
 you want are the results. However, you can dig down into the returned
 result's classes to obtain pretty much any data you want. Most, if not
 all, of the instance properties have attr accessors set up.
 
-For example, if you wanted to know the actual dice tally of a '4d6 !3' roll,
+For example, if you wanted to know the actual dice tally of a '4d6 k3' roll,
 you could do this, after getting the result from Dice::Roll.result():
 
-    result = Dice::Roll.new("4d6 !3").result()
-    tally  = result[0].sections[0].tally()
+```ruby
+result = Dice::Roll.new("4d6 k3").result()
+tally  = result[0].sections[0].tally()
 
-    puts "[%s]" % tally.join("][")
+puts "[%s]" % tally.join("][")
+```
 
-All of the classes have to_s() methods that'll work for most cases.
-
+All of the classes have `to_s` methods that'll work for most cases.
