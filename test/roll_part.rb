@@ -138,7 +138,7 @@ describe DiceBag::RollPart do
       @part.roll
     end
 
-    it 'should have a total of 3' do
+    it 'should have a total of 2' do
       @part.total.must_equal 2
     end
 
@@ -156,7 +156,7 @@ describe DiceBag::RollPart do
       @part.roll
     end
 
-    it 'should have a total of 3' do
+    it 'should have a total of 2' do
       @part.total.must_equal 2
     end
 
