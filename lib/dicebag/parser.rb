@@ -39,6 +39,10 @@ module DiceBag
     # xDx Parts.
     # All xDx parts may be followed by none, one, or more
     # options.
+    #
+    # TODO: Remove the .as(:xdx) and rework the Transform
+    # sub-class to account for it. It'll make the
+    # resulting data much cleaner.
     rule(:xdx) { (count >> sides).as(:xdx) >> options? }
 
     # xdx Options.

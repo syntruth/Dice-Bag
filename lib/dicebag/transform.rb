@@ -14,10 +14,9 @@ module DiceBag
       opts
     end
 
-    # Option transforms. These are turned into an array of
-    # 2-element arrays ('tagged arrays'), which is then
-    # hashified later. (There is no way to update the
-    # options when these rules are matched.)
+    # Options.
+    # The full options hash is updated later with these
+    # sub-hashes.
     rule(drop:    simple(:x)) { { drop:   Integer(x) } }
     rule(keep:    simple(:x)) { { keep:   Integer(x) } }
     rule(reroll:  simple(:x)) { { reroll: Integer(x) } }
@@ -27,49 +26,24 @@ module DiceBag
     # must remain that way.
     rule(explode: simple(:x)) { { explode: (x ? Integer(x) : nil) } }
 
-    # Parts {:ops => (:xdx | :number)}
-    # These are first-match, so the simple number will
-    # be matched before the xdx subtree.
-
-    # Match an operator followed by a static number.
-    # TODO: find out why this is not matching simple
-    # op => integers! -- 2016-04-18
-    rule(op: simple(:o), value: simple(:v)) do
-      [String(o), Integer(v)]
-    end
-
-    # Match an operator followed by an :xdx subtree.
-    rule(op: simple(:o), value: subtree(:part)) do
-      value = if part.is_a? Hash
-                count   = Integer(part[:xdx][:count])
-                sides   = Integer(part[:xdx][:sides])
-                options = Transform.hashify_options(part[:options])
-
-                { xdx: { count: count, sides: sides }, options: options }
-              else
-                Integer(part)
-              end
-
-      [String(o), value]
-    end
-
     # Match a label by itself.
     rule(label: simple(:s)) { [:label, String(s)] }
 
     # Match a label followed by a :start subtree.
     rule(label: simple(:s), start: subtree(:part)) do
-      label = String(s)
-
-      [[:label, label], [:start, part]]
+      [[:label, String(s)], [:start, part]]
     end
 
     # Match a :start subtree, with the label not present.
-    # Note that this returns a hash, but the final output
-    # will still be in an array.
     rule(start: subtree(:part)) do
       [:start, part]
     end
 
+    # Match the xdx and options hash.
+    #
+    # TODO: Remove the .as(:xdx) in the Parser sub-class
+    # and then update this class to account for it. It'll
+    # make the resulting data much cleaner.
     rule(xdx: subtree(:xdx), options: subtree(:opts)) do
       { xdx: xdx, options: Transform.hashify_options(opts) }
     end
@@ -77,6 +51,17 @@ module DiceBag
     # Convert the count and sides of an :xdx part.
     rule(count: simple(:c), sides: simple(:s)) do
       { count: Integer(c), sides: Integer(s) }
+    end
+
+    # Match an operator followed by an :xdx subtree.
+    rule(op: simple(:o), value: subtree(:part)) do
+      part[:options] = Transform.hashify_options(part[:options])
+
+      [String(o), part]
+    end
+
+    rule(op: simple(:o), value: simple(:v)) do
+      [String(o), Integer(v)]
     end
   end
 end
