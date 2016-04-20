@@ -2,7 +2,7 @@
 
 describe DiceBag::Transform do
   before do
-    tree = DiceBag::Parser.new.parse '1d6 e1'
+    tree = DiceBag::Parser.new.parse '1d6 e1 + 2'
     @ast = DiceBag::Transform.new.apply tree
   end
 
@@ -11,20 +11,20 @@ describe DiceBag::Transform do
       @ast.must_be_instance_of Array
     end
 
-    it 'should have a hash as the first element' do
-      @ast.first.must_be_instance_of Hash
+    it 'should have an array as the first element' do
+      @ast.first.must_be_instance_of Array
     end
 
-    it 'must have a :start key in the first hash element' do
-      @ast.first.key?(:start).must_equal true
+    it 'must have a :start op in the first element' do
+      @ast.first[0].must_equal :start
     end
 
-    it 'must have an :xdx key in the :start hash' do
-      @ast.first[:start].key?(:xdx).must_equal true
+    it 'must have an :xdx key in the :start op hash' do
+      @ast.first[1].key?(:xdx).must_equal true
     end
 
-    it 'must have an :options key in the :start hash' do
-      @ast.first[:start].key?(:options).must_equal true
+    it 'must have an :options key in the :start op hash' do
+      @ast.first[1].key?(:options).must_equal true
     end
   end
 end

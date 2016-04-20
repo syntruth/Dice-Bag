@@ -1,7 +1,8 @@
 Gem::Specification.new do |s|
   s.name        = 'dicebag'
-  s.version     = '3.2.0'
+  s.version     = '3.2.1'
   s.date        = '2016-04-18'
+  s.licenses    = ['MIT']
   s.summary     = 'Dice Bag: Ruby Dice Rolling Library'
   s.description = 'A very flexible dice rolling library for Ruby.'
   s.authors     = ['SynTruth']
@@ -10,5 +11,5 @@ Gem::Specification.new do |s|
 
   s.files = Dir['lib/**/*.rb']
 
-  s.add_runtime_dependency 'parslet', ['>= 1.4.0']
+  s.add_runtime_dependency 'parslet', '~> 1.4', '>= 1.4.0'
 end

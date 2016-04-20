@@ -40,32 +40,16 @@ module DiceBag
   # happens in the Roll class. It will convert all
   # values into the correct *Part class.
   def self.normalize_tree(tree)
-    tree.collect do |part|
-      case part
-      when Hash
-        normalize_hash part
-      when Array
-        normalize_array part
-      else
-        part
-      end
-    end
+    tree = [tree] unless tree.first.is_a? Array
+
+    tree.map { |part| normalize part }
   end
 
-  def self.normalize_hash(part)
-    return [:label, LabelPart.new(part[:label])] if part.key? :label
-
-    if part.key? :start
-      xdx = normalize_xdx(part[:start])
-
-      return [:start, RollPart.new(xdx)]
-    end
-
-    part
-  end
-
-  def self.normalize_array(part)
-    [normalize_op(part.first), normalize_value(part.last)]
+  def self.normalize(part)
+    [
+      normalize_op(part.first),
+      normalize_value(part.last)
+    ]
   end
 
   def self.normalize_op(op)
@@ -84,40 +68,47 @@ module DiceBag
   end
 
   def self.normalize_value(val)
-    val.is_a?(Hash) ? RollPart.new(normalize_xdx(val)) : StaticPart.new(val)
+    case val
+    when String
+      LabelPart.new val
+    when Hash
+      RollPart.new normalize_xdx(val)
+    else
+      StaticPart.new val
+    end
   end
 
   # This further massages the xDx hashes.
-  def self.normalize_xdx(xdx)
-    count = xdx[:xdx][:count]
-    sides = xdx[:xdx][:sides]
+  def self.normalize_xdx(hash)
+    count = hash[:xdx][:count]
+    sides = hash[:xdx][:sides]
 
     # Delete the no longer needed :xdx key.
-    xdx.delete(:xdx)
+    hash.delete(:xdx)
 
     # Default to at least 1 die.
     count = 1 if count.zero? || count.nil?
 
     # Set the :count and :sides keys directly
     # and set the notes array.
-    xdx[:count] = count
-    xdx[:sides] = sides
-    xdx[:notes] = []
+    hash[:count] = count
+    hash[:sides] = sides
+    hash[:notes] = []
 
-    normalize_options xdx
+    normalize_options hash
   end
 
-  def self.normalize_options(xdx)
-    if xdx[:options].empty?
-      xdx.delete(:options)
+  def self.normalize_options(hash)
+    if hash[:options].empty?
+      hash.delete(:options)
     else
-      normalize_explode xdx
-      normalize_reroll xdx
-      normalize_drop_keep xdx
-      normalize_target xdx
+      normalize_explode hash
+      normalize_reroll hash
+      normalize_drop_keep hash
+      normalize_target hash
     end
 
-    xdx
+    hash
   end
 
   # Prevent Explosion abuse.

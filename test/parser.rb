@@ -2,7 +2,7 @@
 
 describe DiceBag::Parser do
   before do
-    @parsed = DiceBag::Parser.new.parse '1d6'
+    @parsed = DiceBag::Parser.new.parse '1d6 + 2'
   end
 
   describe 'after parsing' do

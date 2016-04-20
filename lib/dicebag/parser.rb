@@ -5,16 +5,6 @@ module DiceBag
   # components. To understand this code, please refer to
   # the Parslet library's documentation.
   class Parser < Parslet::Parser
-    # We override the #parse method, so that we can
-    # assure that we always return an Array.
-    def parse(dstr)
-      result = super dstr
-
-      result = [result] unless result.is_a? Array
-
-      result
-    end
-
     # Base rules.
     rule(:space?)  { str(' ').repeat }
 
@@ -64,10 +54,11 @@ module DiceBag
     # This allows options to be defined in any order and
     # even have more than one of the same option, however
     # only the last option of a given key will be kept.
-    rule(:options) do
-      space? >> (drop | explode | keep | reroll | target).repeat >> space?
+    rule(:option) do
+      (drop | explode | keep | reroll | target)
     end
 
+    rule(:options) { space? >> option.repeat >> space? }
     rule(:options?) { options.maybe.as(:options) }
 
     # Part Operators.
@@ -81,11 +72,7 @@ module DiceBag
     # A part is an operator, followed by either an xDx
     # string or a static number value.
     rule(:part) do
-      space? >>
-        op >>
-        space? >>
-        (xdx | number).as(:value) >>
-        space?
+      space? >> op >> space? >> (xdx | number).as(:value) >> space?
     end
 
     # All parts of a dice roll MUST start with an xDx

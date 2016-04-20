@@ -1,3 +1,19 @@
+Changes for Version 3.2.1
+* Refactored parts of the Transform class to 1.) fit better with accepted
+  Parslet practices and 2.) better handle how sub-trees are handled,
+	producing more predictable data from it.
+* Refactored parts of the main DiceBag module to reflect changes that were
+  done to the Transform class.
+* Removed the #parse method override from the Parser class, since the logic
+  fit better within the DiceBag#normalize_tree method.
+* Refactored how the :options are parsed within the Parser class to make it
+  a bit more clear what is going on there.
+* Added tests for RollPartString and RollString modules.
+* Updated tests to cover a few more things, as well as added the number list
+  for the manually set srand value. (See comments in the dicebag_test.rb file.
+* Reorganized the test/roll_part.rb to DRY it up a bit more.
+* MOAR BUG FIXES.
+
 Changes for Version 3.2
 * TESTS! Which needed to be done long ago. Really, no exuse. Bad, Syntruth,
   bad!

@@ -4,41 +4,48 @@
 # generation methods.
 module RollString
   def to_s(no_spaces = false)
-    @string = ''
-    @space  = no_spaces ? '' : ' '
+    @parts = []
 
     to_s_tree
 
-    @string.strip
+    str = @parts.join ' '
+
+    no_spaces ? str.tr(' ', '') : str
   end
 
   private
 
   def to_s_tree
-    tree.each { |op, value| @string += send("to_s_#{op}", value) }
+    tree.each do |op, value|
+      @parts.push send("to_s_#{op}", value)
+    end
   end
 
   def to_s_label(value)
-    "#{value}#{@space}"
+    value.to_s
   end
 
   def to_s_start(value)
-    "#{value}#{@space}"
+    value.to_s
   end
 
   def to_s_add(value)
-    "+#{@space}#{value}#{@space}"
+    _op_value '+', value
   end
 
   def to_s_sub(value)
-    "-#{@space}#{value}#{@space}"
+    _op_value '-', value
   end
 
   def to_s_mul(value)
-    "*#{@space}#{value}#{@space}"
+    _op_value '*', value
   end
 
   def to_s_div(value)
-    "/#{@space}#{value}#{@space}"
+    _op_value '/', value
+  end
+
+  def _op_value(op, value)
+    "#{op}#{value}"
   end
 end
