@@ -73,8 +73,10 @@ module DiceBag
       LabelPart.new val
     when Hash
       RollPart.new normalize_xdx(val)
-    else
+    when Integer
       StaticPart.new val
+    else
+      val
     end
   end
 
@@ -112,57 +114,57 @@ module DiceBag
   end
 
   # Prevent Explosion abuse.
-  def self.normalize_explode(xdx)
-    return unless xdx[:options].key? :explode
+  def self.normalize_explode(hash)
+    return unless hash[:options].key? :explode
 
-    explode = xdx[:options][:explode]
+    if hash[:options][:explode] == 1
+      hash[:options][:explode] = hash[:sides]
 
-    if explode.nil? || explode.zero? || explode == 1
-      xdx[:options][:explode] = xdx[:sides]
-
-      xdx[:notes].push("Explode set to #{xdx[:sides]}")
+      hash[:notes].push("Explode set to #{hash[:sides]}")
     end
   end
 
   # Prevent Reroll abuse.
-  def self.normalize_reroll(xdx)
-    return unless xdx[:options].key? :reroll
+  def self.normalize_reroll(hash)
+    return unless hash[:options].key? :reroll
 
-    if xdx[:options][:reroll] >= xdx[:sides]
-      xdx[:options][:reroll] = 0
+    if hash[:options][:reroll] >= hash[:sides]
+      hash[:options][:reroll] = 0
 
-      xdx[:notes].push 'Reroll reset to 0.'
+      hash[:notes].push 'Reroll reset to 0.'
     end
   end
 
   # Make sure there are enough dice to
   # handle both Drop and Keep values.
   # If not, both are reset to 0. Harsh.
-  def self.normalize_drop_keep(xdx)
-    drop = xdx[:options].fetch(:drop, 0)
-    keep = xdx[:options].fetch(:keep, 0)
+  def self.normalize_drop_keep(hash)
+    drop = hash[:options].fetch(:drop, 0)
+    keep = hash[:options].fetch(:keep, 0)
 
-    if (drop + keep) >= xdx[:count]
-      xdx[:options][:drop] = 0
-      xdx[:options][:keep] = 0
+    if (drop + keep) >= hash[:count]
+      hash[:options][:drop] = 0
+      hash[:options][:keep] = 0
 
-      xdx[:notes].push 'Drop and Keep Conflict. Both reset to 0.'
+      hash[:notes].push 'Drop and Keep Conflict. Both reset to 0.'
     end
   end
 
-  # Finally, if we have a target number, make sure it is equal
-  # to or less than the dice sides and greater than 0, otherwise,
-  # set it to 0 (aka no target number) and add a note.
-  def self.normalize_target(xdx)
-    return unless xdx[:options].key? :target
+  # Finally, if we have a target number,
+  # make sure it is equal to or less than
+  # the dice sides and greater than 0,
+  # otherwise, set it to 0 (aka no target
+  # number) and add a note.
+  def self.normalize_target(hash)
+    return unless hash[:options].key? :target
 
-    target = xdx[:options][:target]
+    target = hash[:options][:target]
 
-    return if target >= 0 && target <= xdx[:sides]
+    return if target >= 0 && target <= hash[:sides]
 
-    xdx[:options][:target] = 0
+    hash[:options][:target] = 0
 
-    xdx[:notes].push 'Target number too large or is negative; reset to 0.'
+    hash[:notes].push 'Target number too large or is negative; reset to 0.'
   end
 
   # This is the wrapper for the parse, transform,
@@ -174,6 +176,10 @@ module DiceBag
     ast  = Transform.new.apply(tree)
 
     normalize_tree ast
+  end
+
+  def self.roll(dstr = '')
+    Roll.new(dstr).roll
   end
 end
 

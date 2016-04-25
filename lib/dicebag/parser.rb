@@ -24,10 +24,7 @@ module DiceBag
     rule(:lparen) { str('(') }
     rule(:rparen) { str(')') }
     rule(:label) do
-      lparen >>
-        match('[^(),]').repeat(1).as(:label) >>
-        rparen >>
-        space?
+      lparen >> match('[^(),]').repeat(1).as(:label) >> rparen >> space?
     end
 
     # count and sides rules.
@@ -47,8 +44,8 @@ module DiceBag
 
     # xdx Options.
     # Note that :explode is allowed to NOT have a number
-    # assigned, which will leave it with a nil value.
-    # This is handled in RollPart#initialize.
+    # assigned, which will leave it with a nil value. This
+    # is handled in the Transform class.
     rule(:explode) { str('e') >> number?.as(:explode) >> space? }
     rule(:drop)    { str('d') >> number.as(:drop) >> space? }
     rule(:keep)    { str('k') >> number.as(:keep) >> space? }

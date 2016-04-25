@@ -1,12 +1,12 @@
 # Encoding: UTF-8
 
 describe DiceBag::Transform do
-  before do
-    tree = DiceBag::Parser.new.parse '1d6 e1 + 2'
-    @ast = DiceBag::Transform.new.apply tree
-  end
+  describe 'with a standard dice form' do
+    before do
+      tree = DiceBag::Parser.new.parse '2d6 e1 + 2'
+      @ast = DiceBag::Transform.new.apply tree
+    end
 
-  describe 'after working on the parsed tree' do
     it 'should return an array' do
       @ast.must_be_instance_of Array
     end
@@ -25,6 +25,25 @@ describe DiceBag::Transform do
 
     it 'must have an :options key in the :start op hash' do
       @ast.first[1].key?(:options).must_equal true
+    end
+
+    it 'must have 2 dice in the tree' do
+      @ast.first[1][:xdx][:count].must_equal 2
+    end
+
+    it 'must have 6-sided dice in the tree' do
+      @ast.first[1][:xdx][:sides].must_equal 6
+    end
+  end
+
+  describe 'with a missing number of dice form' do
+    before do
+      tree = DiceBag::Parser.new.parse 'd6 e1 + 2'
+      @ast = DiceBag::Transform.new.apply tree
+    end
+
+    it 'must default to having 1 die' do
+      @ast.first[1][:xdx][:count].must_equal 1
     end
   end
 end

@@ -24,14 +24,17 @@ module DiceBag
 
     # Explode is special, in that if it is nil, then it
     # must remain that way.
-    rule(explode: simple(:x)) { { explode: (x ? Integer(x) : nil) } }
+    rule(explode: simple(:x)) { { explode: (x ? Integer(x) : 1) } }
 
     # Match a label by itself.
-    rule(label: simple(:s)) { [:label, String(s)] }
+    rule(label: simple(:s)) { [:label, LabelPart.new(String(s))] }
 
     # Match a label followed by a :start subtree.
     rule(label: simple(:s), start: subtree(:part)) do
-      [[:label, String(s)], [:start, part]]
+      [
+        [:label, LabelPart.new(String(s))],
+        [:start, part]
+      ]
     end
 
     # Match a :start subtree, with the label not present.
@@ -50,7 +53,7 @@ module DiceBag
 
     # Convert the count and sides of an :xdx part.
     rule(count: simple(:c), sides: simple(:s)) do
-      { count: Integer(c), sides: Integer(s) }
+      { count: (c ? Integer(c) : 1), sides: Integer(s) }
     end
 
     # Match an operator followed by an :xdx subtree.
