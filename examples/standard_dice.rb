@@ -18,6 +18,7 @@ module DiceBag
     D8   = Die.new(8)
     D10  = Die.new(10)
     D12  = Die.new(12)
+    D20  = Die.new(20)
     D100 = Die.new(100)
   end
 end
