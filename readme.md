@@ -5,7 +5,7 @@ Dice Bag: The Ruby Dice Rolling Library
 
 **Author :** Randy Carnahan
 
-**Version:** 3.2.0
+**Version:** 3.2.2
 
 **License:** LGPL OR MIT
 
