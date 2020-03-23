@@ -49,6 +49,7 @@ module DiceBag
     rule(:explode) { str('e') >> number?.as(:explode) >> space? }
     rule(:drop)    { str('d') >> number.as(:drop) >> space? }
     rule(:keep)    { str('k') >> number.as(:keep) >> space? }
+    rule(:keeplowest) {str('kl') >> number.as(:keeplowest) >> space?}
     rule(:reroll)  { str('r') >> number.as(:reroll) >> space? }
     rule(:target)  { str('t') >> number.as(:target) >> space? }
 
@@ -56,7 +57,7 @@ module DiceBag
     # even have more than one of the same option, however
     # only the last option of a given key will be kept.
     rule(:option) do
-      (drop | explode | keep | reroll | target)
+      (drop | explode | keep | keeplowest | reroll | target)
     end
 
     rule(:options) { space? >> option.repeat >> space? }

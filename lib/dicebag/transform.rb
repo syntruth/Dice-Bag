@@ -19,6 +19,7 @@ module DiceBag
     # sub-hashes.
     rule(drop:    simple(:x)) { { drop:   Integer(x) } }
     rule(keep:    simple(:x)) { { keep:   Integer(x) } }
+    rule(keeplowest: simple(:x)) { { keeplowest: Integer(x) } }
     rule(reroll:  simple(:x)) { { reroll: Integer(x) } }
     rule(target:  simple(:x)) { { target: Integer(x) } }
 

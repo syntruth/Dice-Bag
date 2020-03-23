@@ -13,6 +13,7 @@ module RollPartString
     to_s_explode
     to_s_drop
     to_s_keep
+    to_s_keeplowest
     to_s_reroll
     to_s_target
 
@@ -48,6 +49,12 @@ module RollPartString
     return if @options[:keep].zero?
 
     @parts.push format('k%s', @options[:keep])
+  end
+
+  def to_s_keeplowest
+    return if @options[:keeplowest].zero?
+
+    @parts.push format('kl%s', @options[:keeplowest])
   end
 
   def to_s_reroll
