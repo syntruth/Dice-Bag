@@ -20,7 +20,7 @@ module DiceBag
       @notes  = part[:notes] || []
 
       # Our Default Options
-      @options = { explode: 0, drop: 0, keep: 0, reroll: 0, target: 0 }
+      @options = { explode: 0, drop: 0, keep: 0, reroll: 0, target: 0, failure: 0 }
 
       @options.update(part[:options]) if part.key?(:options)
     end
@@ -117,10 +117,15 @@ module DiceBag
 
     def handle_total
       # If we have a target number, count how many rolls
-      # in the results are >= than this number, otherwise
+      # in the results are >= than this number and subtract
+      # the number <= the failure threshold, otherwise
       # we just add up all the numbers.
-      @total = if @options[:target] && @options[:target] > 0
-                 @results.count { |r| r >= @options[:target] }
+      @total = if (@options[:target] || @options[:failure]) && ( @options[:target] > 0 || @options[:failure] > 0 )
+                 if @options[:target] && @options[:target] > 0
+                   @results.count {|r| r >= @options[:target] } - @results.count { |r| r <= @options[:failure] }
+                 else
+                   0 - @results.count { |r| r <= @options[:failure] }
+                 end 
                else
                  # I think reduce(:+) is ugly, but it's very fast.
                  @results.reduce(:+)

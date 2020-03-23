@@ -15,6 +15,7 @@ module RollPartString
     to_s_keep
     to_s_reroll
     to_s_target
+    to_s_failure
 
     join_str = no_spaces ? '' : ' '
 
@@ -60,5 +61,11 @@ module RollPartString
     return if @options[:target].zero?
 
     @parts.push format('t%s', @options[:target])
+  end
+
+  def to_s_failure
+    return if @options[:failure].zero?
+
+    @parts.push format('f%s', @options[:failure])
   end
 end
