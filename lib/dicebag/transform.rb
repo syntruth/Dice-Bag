@@ -17,10 +17,11 @@ module DiceBag
     # Options.
     # The full options hash is updated later with these
     # sub-hashes.
-    rule(drop:    simple(:x)) { { drop:    Integer(x) } }
-    rule(keep:    simple(:x)) { { keep:    Integer(x) } }
-    rule(reroll:  simple(:x)) { { reroll:  Integer(x) } }
-    rule(target:  simple(:x)) { { target:  Integer(x) } }
+    rule(drop:    simple(:x)) { { drop:   Integer(x) } }
+    rule(keep:    simple(:x)) { { keep:   Integer(x) } }
+    rule(keeplowest: simple(:x)) { { keeplowest: Integer(x) } }
+    rule(reroll:  simple(:x)) { { reroll: Integer(x) } }
+    rule(target:  simple(:x)) { { target: Integer(x) } }
     rule(failure: simple(:x)) { { failure: Integer(x) } }
 
     # Explode is special, in that if it is nil, then it

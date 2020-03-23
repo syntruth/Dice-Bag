@@ -20,7 +20,8 @@ module DiceBag
       @notes  = part[:notes] || []
 
       # Our Default Options
-      @options = { explode: 0, drop: 0, keep: 0, reroll: 0, target: 0, failure: 0 }
+      
+      @options = { explode: 0, drop: 0, keep: 0, keeplowest: 0, reroll: 0, target: 0, failure: 0 }
 
       @options.update(part[:options]) if part.key?(:options)
     end
@@ -46,7 +47,18 @@ module DiceBag
     def roll
       generate_results
 
+      if @options[:keeplowest] >= 1
+        @tally = @results.dup
+        @tally.sort!
+        @tally.reverse!
+        @results.sort!
+        handle_keeplowest
+        handle_total
+        return
+      end
+
       @results.sort!
+
       @results.reverse!
 
       # Save the tally in case it's requested later.
@@ -111,6 +123,13 @@ module DiceBag
       return unless @options[:keep] > 0
 
       range = 0...@options[:keep]
+
+      @results = @results.slice range
+    end
+
+    def handle_keeplowest
+      return unless @options[:keeplowest] > 0
+      range = 0...@options[:keeplowest]
 
       @results = @results.slice range
     end
