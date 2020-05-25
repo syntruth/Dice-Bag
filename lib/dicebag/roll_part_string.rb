@@ -11,10 +11,12 @@ module RollPartString
 
     to_s_xdx
     to_s_explode
+    to_s_explode_indefinite
     to_s_drop
     to_s_keep
     to_s_keeplowest
     to_s_reroll
+    to_s_reroll_indefinite
     to_s_target
     to_s_failure
 
@@ -40,6 +42,14 @@ module RollPartString
     @parts.push format('e%s', e)
   end
 
+  def to_s_explode_indefinite
+    return if @options[:explode_indefinite].zero?
+
+    e = (@options[:explode_indefinite] == sides) ? @options[:explode_indefinite] : ''
+
+    @parts.push format('ie%s', e)
+  end
+
   def to_s_drop
     return if @options[:drop].zero?
 
@@ -62,6 +72,12 @@ module RollPartString
     return if @options[:reroll].zero?
 
     @parts.push format('r%s', @options[:reroll])
+  end
+
+  def to_s_reroll_indefinite
+    return if @options[:reroll_indefinite].zero?
+
+    @parts.push format('ir%s', @options[:reroll_indefinite])
   end
 
   def to_s_target

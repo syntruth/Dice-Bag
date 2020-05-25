@@ -46,19 +46,23 @@ module DiceBag
     # Note that :explode is allowed to NOT have a number
     # assigned, which will leave it with a nil value. This
     # is handled in the Transform class.
-    rule(:explode) { str('e') >> number?.as(:explode) >> space? }
-    rule(:drop)    { str('d') >> number.as(:drop) >> space? }
-    rule(:keep)    { str('k') >> number.as(:keep) >> space? }
-    rule(:keeplowest) {str('kl') >> number.as(:keeplowest) >> space?}
-    rule(:reroll)  { str('r') >> number.as(:reroll) >> space? }
-    rule(:target)  { str('t') >> number.as(:target) >> space? }
-    rule(:failure) { str('f') >> number.as(:failure) >> space? }
+    #
+    # For whatever reason ei doesn't work here, so I'm ordering the indefinite options as ie
+    rule(:explode)            { str('e') >> number?.as(:explode) >> space? }
+    rule(:explode_indefinite) { str('ie') >> number?.as(:explode_indefinite) >> space? }
+    rule(:drop)               { str('d') >> number.as(:drop) >> space? }
+    rule(:keep)               { str('k') >> number.as(:keep) >> space? }
+    rule(:keeplowest)         {str('kl') >> number.as(:keeplowest) >> space?}
+    rule(:reroll)             { str('r') >> number.as(:reroll) >> space? }
+    rule(:reroll_indefinite)  { str('ir') >> number.as(:reroll_indefinite) >> space? }
+    rule(:target)             { str('t') >> number.as(:target) >> space? }
+    rule(:failure)            { str('f') >> number.as(:failure) >> space? }
 
     # This allows options to be defined in any order and
     # even have more than one of the same option, however
     # only the last option of a given key will be kept.
     rule(:option) do
-      (drop | explode | keep | keeplowest | reroll | target | failure )
+      (drop | explode | explode_indefinite | keep | keeplowest | reroll | reroll_indefinite | target | failure )
     end
 
     rule(:options) { space? >> option.repeat >> space? }
