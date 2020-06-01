@@ -64,7 +64,26 @@ describe DiceBag::RollPart do
       end
 
       it 'should have a tally of 4 items' do
-        @part.tally.size.must_equal 4
+        @part.tally[0].size.must_equal 3
+        @part.tally[1].size.must_equal 1
+      end
+    end
+
+    describe 'with an exploding indefinitely option' do
+      before do
+        @part = xdx('3d6 ie3').first.last
+
+        make_not_so_random!
+
+        @part.roll
+      end
+
+      it 'should have a total of 21' do
+        @part.total.must_equal 21
+      end
+
+      it 'should explode 5 times' do
+        @part.tally.size.must_equal 5
       end
     end
 
@@ -122,7 +141,7 @@ describe DiceBag::RollPart do
 
     describe 'with an exploding option' do
       before do
-        @part = xdx('3d6 e6 t4').first.last
+        @part = xdx('3d6 e1 t4').first.last
 
         make_not_so_random!
 
@@ -130,11 +149,12 @@ describe DiceBag::RollPart do
       end
 
       it 'should have a total of 2' do
-        @part.total.must_equal 2
+        @part.total.must_equal 3
       end
 
-      it 'should have a tally of 4 items' do
-        @part.tally.size.must_equal 4
+      it 'should have a tally of 3 items and 3 rerolls' do
+        @part.tally[0].size.must_equal 3
+        @part.tally[1].size.must_equal 3
       end
     end
 
