@@ -66,6 +66,9 @@ module DiceBag
         @tally.sort!
         @tally.reverse!
         @results.sort!
+        @results.reverse!
+        handle_drop
+        @results.reverse!
         handle_keeplowest
         handle_total
         handle_explode_tally
