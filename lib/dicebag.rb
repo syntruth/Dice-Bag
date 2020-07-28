@@ -105,9 +105,12 @@ module DiceBag
       hash.delete(:options)
     else
       normalize_explode hash
+      normalize_explode_indefinite hash
       normalize_reroll hash
+      normalize_explode_indefinite hash
       normalize_drop_keep hash
       normalize_target hash
+      normalize_failure hash
     end
 
     hash
@@ -117,8 +120,19 @@ module DiceBag
   def self.normalize_explode(hash)
     return unless hash[:options].key? :explode
 
-    if hash[:options][:explode] == 1
+    if hash[:options][:explode] == -1
       hash[:options][:explode] = hash[:sides]
+
+      hash[:notes].push("Explode set to #{hash[:sides]}")
+    end
+  end
+
+  # Prevent Explosion abuse.
+  def self.normalize_explode_indefinite(hash)
+    return unless hash[:options].key? :explode_indefinite
+
+    if hash[:options][:explode_indefinite] == -1
+      hash[:options][:explode_indefinite] = hash[:sides]
 
       hash[:notes].push("Explode set to #{hash[:sides]}")
     end
@@ -130,6 +144,17 @@ module DiceBag
 
     if hash[:options][:reroll] >= hash[:sides]
       hash[:options][:reroll] = 0
+
+      hash[:notes].push 'Reroll reset to 0.'
+    end
+  end
+
+  # Prevent Reroll abuse.
+  def self.normalize_reroll_indefinite(hash)
+    return unless hash[:options].key? :reroll_indefinite
+
+    if hash[:options][:reroll_indefinite] >= hash[:sides]
+      hash[:options][:reroll_indefinite] = 0
 
       hash[:notes].push 'Reroll reset to 0.'
     end
@@ -148,6 +173,23 @@ module DiceBag
 
       hash[:notes].push 'Drop and Keep Conflict. Both reset to 0.'
     end
+  end
+
+  # If we have a failure number,
+  # make sure it is equal to or less than
+  # the dice sides and greater than 0,
+  # otherwise, set it to 0 (aka no failure
+  # number) and add a note.
+  def self.normalize_failure(hash)
+    return unless hash[:options].key? :failure
+
+    failure = hash[:options][:failure]
+
+    return if failure >= 0 && failure <= hash[:sides]
+
+    hash[:options][:failure] = 0
+
+    hash[:notes].push 'Failure number too large or is negative; reset to 0.'
   end
 
   # Finally, if we have a target number,
