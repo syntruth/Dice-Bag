@@ -10,6 +10,7 @@ module DiceBag
     attr_reader :parts
     attr_reader :options
     attr_reader :tally
+    attr_reader :reroll_count
 
     def initialize(part)
       @total            = nil
@@ -19,6 +20,7 @@ module DiceBag
       @sides            = part[:sides]
       @notes            = part[:notes] || []
       @exploding_series = []
+      @reroll_count = 0
 
       # Our Default Options
       
@@ -45,6 +47,7 @@ module DiceBag
       # Single Reroll
       if num <= @options[:reroll] or num <= @options[:reroll_indefinite]
         num = rand(sides) + 1
+        @reroll_count += 1
       end
 
       # Indefinite rerolls
@@ -53,6 +56,7 @@ module DiceBag
           break
         end
         num = rand(sides) + 1
+        @reroll_count += 1
       end
 
       num
