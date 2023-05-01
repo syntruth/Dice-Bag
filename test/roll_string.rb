@@ -8,10 +8,10 @@ describe RollString do
   end
 
   it 'should reproduce the ROLL_DSTR with spaces by default' do
-    @roll.to_s.must_equal ROLL_DSTR
+    _(@roll.to_s).must_equal ROLL_DSTR
   end
 
   it 'should reproduce the ROLL_DSTR without spaces with a true value' do
-    @roll.to_s(true).must_equal ROLL_DSTR.tr(' ', '')
+    _(@roll.to_s(true)).must_equal ROLL_DSTR.tr(' ', '')
   end
 end
