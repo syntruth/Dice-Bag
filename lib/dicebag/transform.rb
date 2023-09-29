@@ -19,12 +19,16 @@ module DiceBag
     # sub-hashes.
     rule(drop:    simple(:x)) { { drop:   Integer(x) } }
     rule(keep:    simple(:x)) { { keep:   Integer(x) } }
+    rule(keeplowest: simple(:x)) { { keeplowest: Integer(x) } }
     rule(reroll:  simple(:x)) { { reroll: Integer(x) } }
+    rule(reroll_indefinite:  simple(:x)) { { reroll_indefinite: Integer(x) } }
     rule(target:  simple(:x)) { { target: Integer(x) } }
+    rule(failure: simple(:x)) { { failure: Integer(x) } }
 
     # Explode is special, in that if it is nil, then it
     # must remain that way.
-    rule(explode: simple(:x)) { { explode: (x ? Integer(x) : 1) } }
+    rule(explode: simple(:x)) { { explode: (x ? Integer(x) : -1) } }
+    rule(explode_indefinite: simple(:x)) { { explode_indefinite: (x ? Integer(x) : -1) } }
 
     # Match a label by itself.
     rule(label: simple(:s)) { [:label, LabelPart.new(String(s))] }
