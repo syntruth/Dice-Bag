@@ -8,14 +8,14 @@ describe DiceBag::Result do
   end
 
   it 'must have 3 sections' do
-    @result.sections.size.must_equal 3
+    _(@result.sections.size).must_equal 3
   end
 
   it 'must have a total of 13' do
-    @result.total.must_equal 13
+    _(@result.total).must_equal 13
   end
 
   it 'must display a label and total string' do
-    @result.to_s.must_equal 'Dice Roll: 13'
+    _(@result.to_s).must_equal 'Dice Roll: 13'
   end
 end

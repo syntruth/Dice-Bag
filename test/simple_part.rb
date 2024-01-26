@@ -6,10 +6,10 @@ describe DiceBag::SimplePart do
   end
 
   it 'should return the value as a result' do
-    @part.result.must_equal 'test'
+    _(@part.result).must_equal 'test'
   end
 
   it 'should be the value as a string' do
-    @part.to_s.must_equal 'test'
+    _(@part.to_s).must_equal 'test'
   end
 end

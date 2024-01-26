@@ -6,14 +6,14 @@ describe DiceBag::StaticPart do
   end
 
   it 'always uses an fixnum' do
-    @part.value.must_be_instance_of Fixnum
+    _(@part.value).must_be_instance_of Integer
   end
 
   it 'returns the value as the total' do
-    @part.total.must_equal 5
+    _(@part.total).must_equal 5
   end
 
   it 'return the value as a string when converted to a string' do
-    @part.to_s.must_equal '5'
+    _(@part.to_s).must_equal '5'
   end
 end
