@@ -8,31 +8,31 @@ describe DiceBag::Transform do
     end
 
     it 'should return an array' do
-      @ast.must_be_instance_of Array
+      _(@ast).must_be_instance_of Array
     end
 
     it 'should have an array as the first element' do
-      @ast.first.must_be_instance_of Array
+      _(@ast.first).must_be_instance_of Array
     end
 
     it 'must have a :start op in the first element' do
-      @ast.first[0].must_equal :start
+      _(@ast.first[0]).must_equal :start
     end
 
     it 'must have an :xdx key in the :start op hash' do
-      @ast.first[1].key?(:xdx).must_equal true
+      _(@ast.first[1].key?(:xdx)).must_equal true
     end
 
     it 'must have an :options key in the :start op hash' do
-      @ast.first[1].key?(:options).must_equal true
+      _(@ast.first[1].key?(:options)).must_equal true
     end
 
     it 'must have 2 dice in the tree' do
-      @ast.first[1][:xdx][:count].must_equal 2
+      _(@ast.first[1][:xdx][:count]).must_equal 2
     end
 
     it 'must have 6-sided dice in the tree' do
-      @ast.first[1][:xdx][:sides].must_equal 6
+      _(@ast.first[1][:xdx][:sides]).must_equal 6
     end
   end
 
@@ -43,7 +43,7 @@ describe DiceBag::Transform do
     end
 
     it 'must default to having 1 die' do
-      @ast.first[1][:xdx][:count].must_equal 1
+      _(@ast.first[1][:xdx][:count]).must_equal 1
     end
   end
 end
