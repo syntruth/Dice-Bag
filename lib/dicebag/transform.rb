@@ -1,34 +1,49 @@
-# Encoding: UTF-8
-
-# This continues definining the DiceBag module.
+# DiceBag module.
 module DiceBag
-  # This is the Transform subclass that takes the
-  # parsed tree and transforms it into its (almost)
-  # final form. (It gets a normalization pass later.)
+  # This is the Transform subclass that takes the parsed tree and
+  # transforms it into its (almost) final form. (It gets a normalization
+  # pass later.)
   class Transform < Parslet::Transform
     def self.hashify_options(options)
       opts = {}
 
-      options.each { |val| opts.update val } if options.respond_to? :each
+      options.each { |val| opts.update val } if options.respond_to?(:each)
 
       opts
     end
 
     # Options.
-    # The full options hash is updated later with these
-    # sub-hashes.
-    rule(drop:    simple(:x)) { { drop:   Integer(x) } }
-    rule(keep:    simple(:x)) { { keep:   Integer(x) } }
-    rule(keeplowest: simple(:x)) { { keeplowest: Integer(x) } }
-    rule(reroll:  simple(:x)) { { reroll: Integer(x) } }
-    rule(reroll_indefinite:  simple(:x)) { { reroll_indefinite: Integer(x) } }
-    rule(target:  simple(:x)) { { target: Integer(x) } }
-    rule(failure: simple(:x)) { { failure: Integer(x) } }
+    #
+    # The full options hash is updated later with these sub-hashes.
+    rule(drop: simple(:x)) do
+      { drop: Integer(x) }
+    end
 
-    # Explode is special, in that if it is nil, then it
-    # must remain that way.
-    rule(explode: simple(:x)) { { explode: (x ? Integer(x) : -1) } }
-    rule(explode_indefinite: simple(:x)) { { explode_indefinite: (x ? Integer(x) : -1) } }
+    rule(keep: simple(:x)) do
+      { keep: Integer(x) }
+    end
+
+    rule(keeplowest: simple(:x)) do
+      { keeplowest: Integer(x) }
+    end
+
+    rule(reroll: simple(:x)) do
+      { reroll: Integer(x) }
+    end
+
+    rule(target: simple(:x)) do
+      { target: Integer(x) }
+    end
+
+    rule(failure: simple(:x)) do
+      { failure: Integer(x) }
+    end
+
+    # Explode is special, in that if it is nil, then we set it to -1 to
+    # reflect that.
+    rule(explode: simple(:x)) do
+      { explode: (x ? Integer(x) : nil) }
+    end
 
     # Match a label by itself.
     rule(label: simple(:s)) { [:label, LabelPart.new(String(s))] }
@@ -48,16 +63,19 @@ module DiceBag
 
     # Match the xdx and options hash.
     #
-    # TODO: Remove the .as(:xdx) in the Parser sub-class
-    # and then update this class to account for it. It'll
-    # make the resulting data much cleaner.
+    # TODO: Remove the .as(:xdx) in the Parser sub-class and then update
+    # this class to account for it. It'll make the resulting data much
+    # cleaner.
     rule(xdx: subtree(:xdx), options: subtree(:opts)) do
       { xdx: xdx, options: Transform.hashify_options(opts) }
     end
 
     # Convert the count and sides of an :xdx part.
     rule(count: simple(:c), sides: simple(:s)) do
-      { count: (c ? Integer(c) : 1), sides: Integer(s) }
+      {
+        count: (c ? Integer(c) : 1),
+        sides: Integer(s)
+      }
     end
 
     # Match an operator followed by an :xdx subtree.
@@ -67,6 +85,7 @@ module DiceBag
       [String(o), part]
     end
 
+    # Match an operator followed by a immediate value.
     rule(op: simple(:o), value: simple(:v)) do
       [String(o), Integer(v)]
     end

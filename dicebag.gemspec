@@ -9,7 +9,13 @@ Gem::Specification.new do |s|
   s.email       = 'syntruth@gmail.com'
   s.homepage    = 'https://github.com/syntruth/Dice-Bag'
 
+  s.required_ruby_version = '>= 2.7.1'
+
   s.files = Dir['lib/**/*.rb']
+
+  s.require_paths = ['lib', 'lib/systems']
+
+  s.executables << 'dicebag'
 
   s.add_runtime_dependency 'parslet', '~> 1.4', '>= 1.4.0'
 end

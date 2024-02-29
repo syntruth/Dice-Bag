@@ -1,28 +1,27 @@
-# Encoding: UTF-8
-
-# This encapsulates the RollPart string
-# generation methods.
+# This encapsulates the RollPart string generation methods.
 module RollPartString
-  # This takes the @parts hash and recreates the xDx
-  # string. Optionally, passing true to the method will
-  # remove spaces form the finished string.
+  # This takes the @parts hash and recreates the xDx string. Optionally,
+  # passing true to the method will remove spaces from the finished
+  # string.
   def to_s(no_spaces = false)
     @parts = []
 
     to_s_xdx
     to_s_explode
-    to_s_explode_indefinite
     to_s_drop
     to_s_keep
     to_s_keeplowest
     to_s_reroll
-    to_s_reroll_indefinite
     to_s_target
     to_s_failure
 
     join_str = no_spaces ? '' : ' '
 
     @parts.join join_str
+  end
+
+  def inspect
+    "<#{self.class.name} #{self}>"
   end
 
   private
@@ -35,19 +34,11 @@ module RollPartString
   end
 
   def to_s_explode
-    return if @options[:explode].zero?
+    return unless @options.key?(:explode)
 
-    e = (@options[:explode] == sides) ? @options[:explode] : ''
+    e = @options[:explode].nil? ? 'e' : format('e%s', @options[:explode])
 
-    @parts.push format('e%s', e)
-  end
-
-  def to_s_explode_indefinite
-    return if @options[:explode_indefinite].zero?
-
-    e = (@options[:explode_indefinite] == sides) ? @options[:explode_indefinite] : ''
-
-    @parts.push format('ie%s', e)
+    @parts.push e
   end
 
   def to_s_drop
@@ -72,12 +63,6 @@ module RollPartString
     return if @options[:reroll].zero?
 
     @parts.push format('r%s', @options[:reroll])
-  end
-
-  def to_s_reroll_indefinite
-    return if @options[:reroll_indefinite].zero?
-
-    @parts.push format('ir%s', @options[:reroll_indefinite])
   end
 
   def to_s_target

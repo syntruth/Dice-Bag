@@ -1,5 +1,4 @@
-# Encoding: UTF-8
-
+# rubocop:disable Metrics/BlockLength
 describe DiceBag::Roll do
   before do
     @roll = DiceBag::Roll.new '(Dice Roll) 3d6 + 2 + 1d4'
@@ -29,6 +28,10 @@ describe DiceBag::Roll do
     it 'should have a static part' do
       _(@roll.tree[2].last).must_be_instance_of DiceBag::StaticPart
     end
+
+    it 'should have a last roll part' do
+      _(@roll.tree[3].last).must_be_instance_of DiceBag::RollPart
+    end
   end
 
   describe 'after it is rolled' do
@@ -51,3 +54,4 @@ describe DiceBag::Roll do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

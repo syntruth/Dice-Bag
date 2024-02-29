@@ -1,7 +1,4 @@
-# Encoding: UTF-8
-
-# This encapsulates the Roll class' string
-# generation methods.
+# This encapsulates the Roll class' string generation methods.
 module RollString
   def to_s(no_spaces = false)
     @parts = []
@@ -11,6 +8,10 @@ module RollString
     str = @parts.join ' '
 
     no_spaces ? str.tr(' ', '') : str
+  end
+
+  def inspect
+    "<#{self.class.name} #{self}>"
   end
 
   private
@@ -30,22 +31,22 @@ module RollString
   end
 
   def to_s_add(value)
-    _op_value '+', value
+    __op_value '+', value
   end
 
   def to_s_sub(value)
-    _op_value '-', value
+    __op_value '-', value
   end
 
   def to_s_mul(value)
-    _op_value '*', value
+    __op_value '*', value
   end
 
   def to_s_div(value)
-    _op_value '/', value
+    __op_value '/', value
   end
 
-  def _op_value(op, value)
-    "#{op}#{value}"
+  def __op_value(oper, value)
+    "#{oper}#{value}"
   end
 end

@@ -1,9 +1,8 @@
-# Encoding: UTF-8
-
+# rubocop:disable Metrics/BlockLength
 describe DiceBag::Transform do
   describe 'with a standard dice form' do
     before do
-      tree = DiceBag::Parser.new.parse '2d6 e1 + 2'
+      tree = DiceBag::Parser.new.parse '2d6 e + 2'
       @ast = DiceBag::Transform.new.apply tree
     end
 
@@ -38,7 +37,7 @@ describe DiceBag::Transform do
 
   describe 'with a missing number of dice form' do
     before do
-      tree = DiceBag::Parser.new.parse 'd6 e1 + 2'
+      tree = DiceBag::Parser.new.parse 'd6 e + 2'
       @ast = DiceBag::Transform.new.apply tree
     end
 
@@ -47,3 +46,4 @@ describe DiceBag::Transform do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

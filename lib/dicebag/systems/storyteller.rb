@@ -1,11 +1,8 @@
-# Encoding: UTF-8
-
-require 'rubygems'
 require 'dicebag'
 
-# This is actually modeling the "Storytelling" system dice, not the older
-# "Storyteller" system dice, but I personally find "Storytelling" kind of a
-# silly name; prefer the older name. :D
+# This is actually modeling the "Storytelling" system dice, not the
+# older "Storyteller" system dice, but I personally find "Storytelling"
+# kind of a silly name, so I prefer the older name. :D
 module Storyteller
   # This is a models a pool of Storyteller dice.
   class Pool < DiceBag::Roll
@@ -38,5 +35,11 @@ module Storyteller
     end
   end
 
-  Chance = Pool.new(1, 10)
+  def self.roll(number = 1, success = 8)
+    Pool.new(number, success).roll
+  end
+
+  def self.chance
+    Pool.new(1, 10).roll
+  end
 end

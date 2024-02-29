@@ -1,5 +1,4 @@
-# Encoding: UTF-8
-
+# rubocop:disable Metrics/BlockLength
 describe DiceBag::RollPart do
   describe 'for a non-target roll' do
     describe 'with no options' do
@@ -64,26 +63,7 @@ describe DiceBag::RollPart do
       end
 
       it 'should have a tally of 4 items' do
-        _(@part.tally[0].size).must_equal 3
-        _(@part.tally[1].size).must_equal 1
-      end
-    end
-
-    describe 'with an exploding indefinitely option' do
-      before do
-        @part = xdx('3d6 ie3').first.last
-
-        make_not_so_random!
-
-        @part.roll
-      end
-
-      it 'should have a total of 21' do
-        _(@part.total).must_equal 21
-      end
-
-      it 'should explode 5 times' do
-        _(@part.tally.size).must_equal 5
+        _(@part.tally.size).must_equal 4
       end
     end
 
@@ -141,7 +121,7 @@ describe DiceBag::RollPart do
 
     describe 'with an exploding option' do
       before do
-        @part = xdx('3d6 e1 t4').first.last
+        @part = xdx('3d6 e t4').first.last
 
         make_not_so_random!
 
@@ -149,12 +129,11 @@ describe DiceBag::RollPart do
       end
 
       it 'should have a total of 2' do
-        _(@part.total).must_equal 3
+        _(@part.total).must_equal 2
       end
 
-      it 'should have a tally of 3 items and 3 rerolls' do
-        _(@part.tally[0].size).must_equal 3
-        _(@part.tally[1].size).must_equal 3
+      it 'should have a tally of 4' do
+        _(@part.tally.size).must_equal 4
       end
     end
 
@@ -195,3 +174,4 @@ describe DiceBag::RollPart do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

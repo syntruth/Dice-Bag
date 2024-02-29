@@ -1,10 +1,7 @@
-# Encoding: UTF-8
-
 module DiceBag
-  # This is the 'main' class of Dice Bag. This class
-  # takes the dice string, parses it, and encapsulates
-  # the actual rolling of the dice. If no dice string
-  # is given, it defaults to DefaultRoll.
+  # This is the 'main' class of Dice Bag. This class takes the dice
+  # string, parses it, and encapsulates the actual rolling of the dice.
+  # If no dice string is given, it defaults to DiceBag.default_roll
   class Roll
     include RollString
 
@@ -14,21 +11,28 @@ module DiceBag
     alias parsed tree
 
     def initialize(dstr = nil)
-      @dstr   = dstr ||= DEFAULT_ROLL
+      @dstr   = dstr ||= DiceBag.default_roll
       @tree   = DiceBag.parse dstr
       @result = nil
     end
 
     def notes
-      str = ''
+      arr = []
+      fmt = "For %s: %s\n"
 
       tree.each do |_op, part|
-        next unless part.is_a?(RollPart) || !part.notes.empty?
-
-        str += format('For: %s\n%s\n\n', part, part.notes)
+        if part.is_a?(RollPart) && !part.notes.empty?
+          arr.push format(fmt, part, part.notes)
+        end
       end
 
-      str
+      arr
+    end
+
+    def notes_to_s
+      n = notes
+
+      n.empty? ? '' : n.join("\n")
     end
 
     def result
@@ -62,8 +66,8 @@ module DiceBag
       end
     end
 
-    def handle_op(op, part)
-      case op
+    def handle_op(oper, part)
+      case oper
       when :start then @total  = part.total
       when :add   then @total += part.total
       when :sub   then @total -= part.total

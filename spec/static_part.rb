@@ -1,11 +1,9 @@
-# Encoding: UTF-8
-
 describe DiceBag::StaticPart do
   before do
     @part = DiceBag::StaticPart.new '5'
   end
 
-  it 'always uses an fixnum' do
+  it 'always uses an Integer' do
     _(@part.value).must_be_instance_of Integer
   end
 

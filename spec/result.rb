@@ -1,5 +1,3 @@
-# Encoding: UTF-8
-
 describe DiceBag::Result do
   before do
     make_not_so_random!

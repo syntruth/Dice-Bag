@@ -1,8 +1,7 @@
 module DiceBag
-  # The most simplest of a part. If a given part of
-  # a dice string is not a Label, Fixnum, or a xDx part
-  # it will be an instance of this class, which simply
-  # returns the value given to it.
+  # The most simplest of a part. If a given part of a dice string is not
+  # a Label, Fixnum, or a xDx part it will be an instance of this class,
+  # which simply returns the value given to it.
   class SimplePart
     attr_reader :value
 
@@ -16,6 +15,10 @@ module DiceBag
 
     def to_s
       value
+    end
+
+    def inspect
+      "<#{self.class.name} #{self}>"
     end
   end
 end

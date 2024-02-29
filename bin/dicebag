@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+# require 'dicebag'
+require_relative '../lib/dicebag'
+
+# Define the Dicebag CLI app
+class DiceBagCLI
+  attr_reader :params
+
+  def self.call
+    new.perform
+  end
+
+  def initialize
+    @params = { notes: false }
+  end
+
+  def opts
+    @opts ||= OptionParser.new do |args|
+      args.on '-n', '--notes', 'Display any notes for the roll.'
+    end
+  end
+
+  def perform
+    nonopts = opts.parse! into: params
+
+    roll   = DiceBag::Roll.new nonopts.first
+    result = roll.roll
+
+    puts result
+
+    puts_notes(roll) if params[:notes]
+  rescue StandardError => err
+    abort err.to_s
+  end
+
+  def puts_notes(roll)
+    nstr = roll.notes_to_s
+
+    return if nstr.empty?
+
+    puts nstr
+  end
+end
+
+DiceBagCLI.call

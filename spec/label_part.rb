@@ -1,5 +1,3 @@
-# Encoding: UTF-8
-
 describe DiceBag::LabelPart do
   before do
     @part = DiceBag::LabelPart.new('test')
