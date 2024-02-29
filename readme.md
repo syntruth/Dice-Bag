@@ -44,9 +44,14 @@ result to STDOUT.
 
 If the `-n` or `--notes` flag is given, then any notes generated from the parsing of the dice string will be below the result.
 
-```shell
-$ dicebag 4d6 k3
+```text
+$ dicebag "4d6 k3"
 16
+
+# 10 is not valid for a reroll value >= 4!
+$ dicebag --notes "1d4 r10"
+3
+For 1d4: Reroll reset to 0.
 
 # 1 is an invalid option for exploding dice!
 $ dicebag --notes 1d4e1
