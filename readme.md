@@ -36,6 +36,24 @@ the string.
 gem install dicebag
 ```
 
+## Commandline Utility
+
+As of version 3.3.0, a `dicebag` executable is installed as well. It's
+nothing fancy, as it just simply takes a dice string and prints the
+result to STDOUT.
+
+If the `-n` or `--notes` flag is given, then any notes generated from the parsing of the dice string will be below the result.
+
+```shell
+$ dicebag 4d6 k3
+16
+
+# 1 is an invalid option for exploding dice!
+$ dicebag --notes 1d4e1
+1
+For 1d4 e: Explode set to 4
+```
+
 ## Usage
 
 ### Dice Strings
@@ -148,7 +166,8 @@ This would output something like the following:
 Damage: 15
 ```
 
-Or, if your needs are just knowing the results, you can use the shorthand method of `DiceBag.roll`, which returns a `Result`:
+Or, if your needs are just knowing the results, you can use the
+shorthand method of `DiceBag.roll`, which returns a `Result`:
 
 ```ruby
 puts DiceBag.roll('4d6 d1')
