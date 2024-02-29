@@ -239,7 +239,7 @@ D20.roll 0, 15
 D20Advantage.roll
 
 # 1d20 twice, keep the lowest >= DC 10
-D20Advantage.roll
+D20Disadvantage.roll
 ```
 
 ### Fudge/FATE
