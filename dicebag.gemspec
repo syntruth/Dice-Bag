@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'dicebag'
-  s.version     = '3.3.0'
+  s.version     = File.read('VERSION').strip
   s.date        = '2016-04-25'
   s.licenses    = ['MIT']
   s.summary     = 'Dice Bag: Ruby Dice Rolling Library'

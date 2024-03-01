@@ -42,7 +42,8 @@ As of version 3.3.0, a `dicebag` executable is installed as well. It's
 nothing fancy, as it just simply takes a dice string and prints the
 result to STDOUT.
 
-If the `-n` or `--notes` flag is given, then any notes generated from the parsing of the dice string will be below the result.
+If the `-n` or `--notes` flag is given, then any notes generated from
+the parsing of the dice string will be below the result.
 
 ```text
 $ dicebag "4d6 k3"
@@ -142,8 +143,8 @@ games.) Because of this, the total may be negative. If this option is
 given a 0 value, that is the same as not having the option at all; that
 is, a normal sum of all dice in the roll is performed instead.
 
-**Note:** if any value is reset because of a validation failure, a note is
-attached to the Roll.
+**Note:** if any value is reset because of a validation failure, a note
+is attached to the Roll.
 
 ### Dice String Limitations
 
@@ -158,7 +159,7 @@ Using the library is rather straight forward:
 ```ruby
 require 'dicebag'
 
-dstr   = "(Damage) 2d8 + 5 + 1d6"
+dstr   = '(Damage) 2d8 + 5 + 1d6'
 dice   = DiceBag::Roll.new(dstr)
 result = dice.result()
 
@@ -175,27 +176,27 @@ Or, if your needs are just knowing the results, you can use the
 shorthand method of `DiceBag.roll`, which returns a `Result`:
 
 ```ruby
-puts DiceBag.roll('4d6 d1')
+puts DiceBag.roll('2d8 + 5 + 1d6')
 ```
 
-The returned result from `Roll#result` is an instance of the `Result`
-class, which has methods to access the label (if any), the total of the
-roll, and also each of the sections that made up the roll.
+The returned result is an instance of the `Result` class, which has
+methods to access the label (if any), the total of the roll, and also
+each of the sections that made up the roll.
 
 It is possible to get the individual sections values as well:
 
 ```ruby
 result.each do |section|
-  puts "%s: %s" % [section, section.total]
+  puts format('%s: %s', section, section.total)
 end
 ```
 
 For the above given dice string, would print something like this:
 
 ```text
-2d8: 7
-  5: 5
-1d6: 3
+2d8: 12
+5: 5
+1d6: 4
 ```
 
 Also, if you are curious to see how the dice string was parsed, you can
@@ -228,7 +229,7 @@ Dice::Roll.result():
 result = Dice::Roll.new("4d6 k3").result()
 tally  = result[0].sections[0].tally()
 
-puts "[%s]" % tally.join("][")
+puts format '[%s]', tally.join("][")
 ```
 
 All of the classes have `to_s` and `inspect` methods that'll work for
@@ -236,7 +237,9 @@ most cases.
 
 ## Included RPG Systems Dice
 
-There are some pre-built dice libraries based on popular (and some not as popular) RPGs, that are not required by default, but can be loaded via the paths given below.
+There are some pre-built dice libraries based on popular (and some not
+as popular) RPGs, that are not required by default, but can be loaded
+via the paths given below.
 
 The following RPG system dice are included in this update:
 
@@ -268,7 +271,7 @@ D20Disadvantage.roll
 
 ### Fudge/FATE
 
-This load the Fudge (and FATE) usable dice. By default it will roll 4dF
+This loads the Fudge (and FATE) usable dice. By default it will roll 4dF
 and will return a two element array, consisting of the total and a
 string representation of the dice results.
 
@@ -327,15 +330,21 @@ Both of the `NoTrait` and `NoTraitWildDie` types automatically have the
 At this time, each one does not take any additional modifiers to the
 roll, so you will have to handle that externally.
 
-All of the Savage Worlds dice are keys to explode ('Ace' in Savage
+All of the Savage Worlds dice are keyed to explode ('Ace' in Savage
 Worlds terminology), so for normal rolls for tables, etc, use the
 standard dice definitions below.
+
+Each die also has a `.half` property that will return the half value of
+the die, useful for Parry and Toughness calculations.
 
 ```ruby
 require 'dicebag/systems/savage_worlds'
 
 # Models a 1d4e+2 for a Trait roll.
 SavageWorlds::D4.roll.total + 2 # => 8 (It exploaded!)
+
+# Calculate Parry
+SavageWorlds::D8.half + 2 # => 6
 ```
 
 ### Standard
@@ -360,15 +369,15 @@ D100
 
 ### Storyteller
 
-This models the WhiteWolf systems dice pool mechanics.
+This models the WhiteWolf/World of Darkness systems dice pool mechanics.
 
 This is actually modeling the "Storytelling" system dice, not the older
 "Storyteller" system dice, but I personally find "Storytelling" kind of
 a silly name, so I prefer the older name. :D
 
 There is a `Storyteller.roll(number, success)` method to roll the number
-of d10s and count how many successes (>= success value) are generated.
-There is also a `Storyteller.chance` method that will roll a since
+of d10s and count how many successes (>= `success` value) are generated.
+There is also a `Storyteller.chance` method that will roll a single
 1d10/10 dice.
 
 ```ruby

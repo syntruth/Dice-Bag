@@ -18,14 +18,25 @@ class DiceBagCLI
 
   def opts
     @opts ||= OptionParser.new do |args|
+      args.banner = 'Usage: dicebag [-n | --notes] <dice string>'
+
       args.on '-n', '--notes', 'Display any notes for the roll.'
+
+      args.on_head('-h', 'Displays this help.') do
+        puts args
+
+        exit
+      end
     end
   end
 
   def perform
+    abort(opts.help) if ARGV.empty?
+
     nonopts = opts.parse! into: params
 
-    roll   = DiceBag::Roll.new nonopts.first
+    dstr   = nonopts.join(' ')
+    roll   = DiceBag::Roll.new dstr
     result = roll.roll
 
     puts result

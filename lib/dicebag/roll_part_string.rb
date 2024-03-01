@@ -34,9 +34,9 @@ module RollPartString
   end
 
   def to_s_explode
-    return unless @options.key?(:explode)
+    return unless @options.key?(:explode) && @options[:explode].positive?
 
-    e = @options[:explode].nil? ? 'e' : format('e%s', @options[:explode])
+    e = format('e%s', @options[:explode])
 
     @parts.push e
   end

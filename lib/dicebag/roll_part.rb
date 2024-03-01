@@ -96,14 +96,14 @@ module DiceBag
     def generate_results
       @results = []
 
-      explode = @options.key?(:explode)
+      explode = @options[:explode]
 
       count.times do
         roll = roll_die
 
         @results.push(roll)
 
-        handle_explode(roll) if explode
+        handle_explode(roll) unless explode.nil?
       end
     end
 

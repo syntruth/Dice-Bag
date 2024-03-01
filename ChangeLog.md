@@ -1,5 +1,14 @@
 # DiceBag
 
+## Version 3.3.1
+
+- FIX: Issue with default no-value-given, explode option.
+- FIX: `Transform.hashify_options` not handling a Hash argument
+  smoothly.
+- Allow `dicebag` executable to not need quotes around dice strings.
+- Make `dicebag` executable handle not having any arguments better and
+  added a `-h` option.
+
 ## Version 3.3.0
 
 - Code refactoring and clean up.

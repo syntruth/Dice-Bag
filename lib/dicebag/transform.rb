@@ -5,6 +5,8 @@ module DiceBag
   # pass later.)
   class Transform < Parslet::Transform
     def self.hashify_options(options)
+      return options if options.is_a? Hash
+
       opts = {}
 
       options.each { |val| opts.update val } if options.respond_to?(:each)
@@ -40,9 +42,9 @@ module DiceBag
     end
 
     # Explode is special, in that if it is nil, then we set it to -1 to
-    # reflect that.
+    # reflect that, and it'll be updated in the normalization phase.
     rule(explode: simple(:x)) do
-      { explode: (x ? Integer(x) : nil) }
+      { explode: (x ? Integer(x) : -1) }
     end
 
     # Match a label by itself.

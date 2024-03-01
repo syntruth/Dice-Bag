@@ -101,11 +101,19 @@ module DiceBag
 
       explode = hash[:options][:explode]
 
-      return if explode.nil? || explode >= 2
+      # If we did not come with a value, set it to dice sides, but no
+      # need to note this, as this is what no values means.
+      return __set_explode_to_sides(hash) if explode.negative?
 
-      hash[:options][:explode] = nil
+      # But we do want to note if the explode value was set to 1. >:|
+      __set_explode_to_sides if explode == 1
 
       hash[:notes].push("Explode set to #{hash[:sides]}")
+    end
+
+    # :nodoc:
+    def __set_explode_to_sides(hash)
+      hash[:options][:explode] = hash[:sides]
     end
 
     # Prevent Reroll abuse.
