@@ -4,7 +4,7 @@
 
 **Author :** Randy Carnahan
 
-**Version:** 3.3.0
+**Version:** 3.3.1
 
 **License:** LGPL OR MIT
 
