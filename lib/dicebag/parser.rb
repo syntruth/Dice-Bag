@@ -11,7 +11,7 @@ module DiceBag
     # Numbers are limited to 3 digit places. Why?
     # To prevent abuse from people rolling:
     # 999999999D999999999 and 'DOS'-ing the app.
-    rule(:number)  { match('[0-9]').repeat(1, 3) }
+    rule(:number)  { match('[0-9]').repeat(1, 4) }
     rule(:number?) { number.maybe }
 
     # Label rule
