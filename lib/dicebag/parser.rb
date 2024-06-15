@@ -8,7 +8,7 @@ module DiceBag
     # Base rules.
     rule(:space?)  { str(' ').repeat }
 
-    # Numbers are limited to 3 digit places. Why?
+    # Numbers are limited to 4 digit places. Why?
     # To prevent abuse from people rolling:
     # 999999999D999999999 and 'DOS'-ing the app.
     rule(:number)  { match('[0-9]').repeat(1, 4) }
