@@ -180,7 +180,6 @@ module DiceBag
     end
 
     def handle_keeplowest
-
       return unless @options[:keeplowest] > 0
       range = 0...@options[:keeplowest]
 
