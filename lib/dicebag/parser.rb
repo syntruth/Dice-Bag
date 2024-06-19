@@ -52,17 +52,18 @@ module DiceBag
     rule(:explode_indefinite) { str('ie') >> number?.as(:explode_indefinite) >> space? }
     rule(:drop)               { str('d') >> number.as(:drop) >> space? }
     rule(:keep)               { str('k') >> number.as(:keep) >> space? }
-    rule(:keeplowest)         {str('kl') >> number.as(:keeplowest) >> space?}
+    rule(:keeplowest)         { str('kl') >> number.as(:keeplowest) >> space?}
     rule(:reroll)             { str('r') >> number.as(:reroll) >> space? }
     rule(:reroll_indefinite)  { str('ir') >> number.as(:reroll_indefinite) >> space? }
     rule(:target)             { str('t') >> number.as(:target) >> space? }
     rule(:failure)            { str('f') >> number.as(:failure) >> space? }
+    rule(:botch)              { str('b') >> number.as(:botch) >> space? }
 
     # This allows options to be defined in any order and
     # even have more than one of the same option, however
     # only the last option of a given key will be kept.
     rule(:option) do
-      (drop | explode | explode_indefinite | keep | keeplowest | reroll | reroll_indefinite | target | failure )
+      (drop | explode | explode_indefinite | keep | keeplowest | reroll | reroll_indefinite | target | failure | botch )
     end
 
     rule(:options) { space? >> option.repeat >> space? }

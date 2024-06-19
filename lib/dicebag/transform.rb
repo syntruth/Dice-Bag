@@ -24,6 +24,7 @@ module DiceBag
     rule(reroll_indefinite:  simple(:x)) { { reroll_indefinite: Integer(x) } }
     rule(target:  simple(:x)) { { target: Integer(x) } }
     rule(failure: simple(:x)) { { failure: Integer(x) } }
+    rule(botch:   simple(:x)) { { botch: Integer(x) } }
 
     # Explode is special, in that if it is nil, then it
     # must remain that way.

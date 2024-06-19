@@ -19,6 +19,7 @@ module RollPartString
     to_s_reroll_indefinite
     to_s_target
     to_s_failure
+    to_s_botch
 
     join_str = no_spaces ? '' : ' '
 
@@ -90,5 +91,11 @@ module RollPartString
     return if @options[:failure].zero?
 
     @parts.push format('f%s', @options[:failure])
+  end
+
+  def to_s_botch
+    return if @options[:botch].zero?
+
+    @parts.push format('b%s', @options[:botch])
   end
 end

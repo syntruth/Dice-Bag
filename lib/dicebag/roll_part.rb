@@ -24,7 +24,7 @@ module DiceBag
 
       # Our Default Options
       
-      @options = { explode: 0, explode_indefinite: 0, drop: 0, keep: 0, keeplowest: 0, reroll: 0, reroll_indefinite: 0, target: 0, failure: 0 }
+      @options = { explode: 0, explode_indefinite: 0, drop: 0, keep: 0, keeplowest: 0, reroll: 0, reroll_indefinite: 0, target: 0, failure: 0, botch: 0 }
 
       @options.update(part[:options]) if part.key?(:options)
     end
@@ -91,6 +91,8 @@ module DiceBag
 
       # Keep the high end numbers if :keep is greater than zero.
       handle_keep
+
+      handle_botch
 
       # Set the total.
       handle_total
@@ -178,8 +180,16 @@ module DiceBag
     end
 
     def handle_keeplowest
+
       return unless @options[:keeplowest] > 0
       range = 0...@options[:keeplowest]
+
+      @results = @results.slice range
+    end
+
+    def handle_botch
+      return unless @options[:botch] > 0
+      range = 0...@options[:botch]
 
       @results = @results.slice range
     end
