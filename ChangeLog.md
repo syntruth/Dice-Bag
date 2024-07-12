@@ -1,5 +1,9 @@
 # DiceBag
 
+## Version 3.3.2
+
+- Update: Allow 4 digit numbers in dice strings.
+
 ## Version 3.3.1
 
 - FIX: Issue with default no-value-given, explode option.
@@ -80,7 +84,7 @@
 - Added the 't#' target number option to xDx strings. See the README
   file.
 - Changed the ~ (drop) and ! (keep) xDx option sigils to be 'd' and 'k'
-  respectively. This breaks sligtly with tradition, but keeps things a
+  respectively. This breaks slightly with tradition, but keeps things a
   bit more normalized option-sigil-wise. Or something.
 
 ## Version 3.0.4 and 3.0.5

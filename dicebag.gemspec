@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.licenses    = ['MIT']
   s.summary     = 'Dice Bag: Ruby Dice Rolling Library'
   s.description = 'A very flexible dice rolling library for Ruby.'
-  s.authors     = ['SynTruth']
+  s.authors     = ['Randy "syntruth" Carnahan']
   s.email       = 'syntruth@gmail.com'
   s.homepage    = 'https://github.com/syntruth/Dice-Bag'
 

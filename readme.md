@@ -2,9 +2,9 @@
 
 **Name   :** Dice Bag Library for Ruby
 
-**Author :** Randy Carnahan
+**Author :** Randy "syntruth" Carnahan
 
-**Version:** 3.3.1
+**Version:** 3.3.2
 
 **License:** LGPL OR MIT
 
@@ -138,7 +138,7 @@ normal sum of all dice in the roll is performed instead.
 beneath in order to count against successes. These work as a sort of
 negitive successes and are totaled together as described above. For
 example, '5d10 t8 f1' means roll five 10-sided dice and each die that is
-8 or higher is a success and subtract each one. (Like in WhiteWolf
+8 or higher is a success and subtract each one. (Like in White Wolf
 games.) Because of this, the total may be negative. If this option is
 given a 0 value, that is the same as not having the option at all; that
 is, a normal sum of all dice in the roll is performed instead.
@@ -148,8 +148,8 @@ is attached to the Roll.
 
 ### Dice String Limitations
 
-Within the dice library itself, simple (xDx) strings are limited to 3
-digits for all parts of the string. This is to prevent honkin' huge
+Within the dice library itself, simple (xDx) strings are limited to 4
+digits for all parts of the string. This is to prevent heckin' chonker
 numbers that *some* users abuse to lag out the dice rolling process.
 
 ## Using the Dice Library

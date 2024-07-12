@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-# require 'dicebag'
+
 require_relative '../lib/dicebag'
 
 # Define the Dicebag CLI app
