@@ -38,9 +38,8 @@ gem install dicebag
 
 ## Commandline Utility
 
-As of version 3.3.0, a `dicebag` executable is installed as well. It's
-nothing fancy, as it just simply takes a dice string and prints the
-result to STDOUT.
+A `dicebag` executable is installed as well. It's nothing fancy, as it
+just simply takes a dice string and prints the result to STDOUT.
 
 If the `-n` or `--notes` flag is given, then any notes generated from
 the parsing of the dice string will be below the result.
@@ -58,6 +57,29 @@ For 1d4: Reroll reset to 0.
 $ dicebag --notes 1d4e1
 1
 For 1d4 e: Explode set to 4
+
+# To get the average of a roll
+$ dicebag --avg 3d6
+10
+
+# To get the maximum of a roll
+$ dicebag --max 3d6
+18
+
+# To get the minimum of a roll
+$ dicebag --min 3d6
+3
+```
+
+### Commandline Arguments
+
+```
+Usage: dicebag [-n|--notes] [--avg|--max|--min] <string>
+    -h                               Displays this help.
+        --avg                        Display the average for the roll.
+        --max                        Display the maximum for the roll.
+        --min                        Display the minimum for the roll.
+    -n, --notes                      Display any notes for the roll.
 ```
 
 ## Usage
@@ -132,7 +154,7 @@ target number is added to a total of successes. For example, '5d10 t8'
 means roll five 10-sided dice and each die that is 8 or higher is a
 success. (Similar to WhiteWolf games.) If this option is given a 0
 value, that is the same as not having the option at all; that is, a
-normal sum of all dice in the roll is performed instead. 
+normal sum of all dice in the roll is performed instead.
 
 `f#`: this denotes a failure number that each dice must match or be
 beneath in order to count against successes. These work as a sort of
@@ -161,7 +183,7 @@ require 'dicebag'
 
 dstr   = '(Damage) 2d8 + 5 + 1d6'
 dice   = DiceBag::Roll.new(dstr)
-result = dice.result()
+result = dice.result
 
 puts result
 ```
@@ -226,8 +248,8 @@ roll, you could do this, after getting the result from
 Dice::Roll.result():
 
 ```ruby
-result = Dice::Roll.new("4d6 k3").result()
-tally  = result[0].sections[0].tally()
+result = Dice::Roll.new('4d6 k3').result
+tally  = result[0].sections[0].tally
 
 puts format '[%s]', tally.join("][")
 ```
@@ -235,13 +257,75 @@ puts format '[%s]', tally.join("][")
 All of the classes have `to_s` and `inspect` methods that'll work for
 most cases.
 
+## Average, Maximum, and Minimum
+
+If you are curious about what the average of a roll might be, or the
+maximum or minimum that can be rolled, you can use several convience
+methods that does the math for you.
+
+### Average
+
+Using the `average` method on a Roll object, will return the average
+roll for a given dice string. This result might be a Float value, as the
+results are not rounded. If you always want to assure an Integer, just
+used `to_i` as per normal Ruby
+
+```ruby
+roll = DiceBag::Roll.new('3d6 - 1d4')
+
+puts roll.average # => 8.0
+```
+
+### Maximum
+
+Using the `maximum` method will return the highest value that can be
+rolled for the given dice string, taking into account any math included
+in the given string. That means subtraction and division are handled
+correctly.
+
+For example, if you have `3d6 - 1d4` it will always use the value of 1
+for the `- 1d4` part of the roll.
+
+Esssentially, subtraction and division are reversed for the Maximum
+calculations.
+
+```ruby
+roll = DiceBag::Roll.new('3d6 - 1d4')
+
+puts roll.maximum # => 17 (18 - 1)
+```
+
+### Minimum
+
+This is just like Maximum above, but with all the math reversed. For the
+above example of `- 1d4`, it will always use 4 as the value.
+
+```ruby
+roll = DiceBag::Roll.new('3d6 - 1d4')
+
+puts roll.minimum # => -1 (3 - 4)
+```
+
+### Convienence Methods
+
+The main `DiceBag` object exposes 3 methods to quickly get the average,
+maximum, and minimum results.
+
+```ruby
+dstr = '3d6 - 1d4'
+
+puts DiceBag.average(dstr)
+puts DiceBag.maximum(dstr)
+puts DiceBag.minimum(dstr)
+```
+
 ## Included RPG Systems Dice
 
 There are some pre-built dice libraries based on popular (and some not
 as popular) RPGs, that are not required by default, but can be loaded
 via the paths given below.
 
-The following RPG system dice are included in this update:
+The following RPG system dice are included:
 
 ### Dungeons and Dragons
 

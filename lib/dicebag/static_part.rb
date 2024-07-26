@@ -5,12 +5,17 @@ module DiceBag
     def initialize(num)
       num = num.to_i if num.is_a?(String)
 
-      super num
+      super(num)
     end
 
     def total
       value
     end
+
+    # These are all just the same for this part.
+    alias average total
+    alias maximum total
+    alias minimum total
 
     def to_s
       value.to_s

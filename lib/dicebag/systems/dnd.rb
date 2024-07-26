@@ -50,7 +50,7 @@ class D20Advantage < D20
     r1 = @roll.roll
     r2 = @roll.roll
 
-    r1 > r2 ? r1 : r2
+    [r1, r2].max
   end
 end
 
@@ -60,6 +60,6 @@ class D20Disadvantage < D20
     r1 = @roll.roll
     r2 = @roll.roll
 
-    r1 < r2 ? r1 : r2
+    [r1, r2].min
   end
 end

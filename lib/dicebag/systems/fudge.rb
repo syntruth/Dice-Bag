@@ -46,9 +46,7 @@ module Fudge
     def to_s
       base = "#{@number}dF"
 
-      "#{base} #{tally_to_s} => #{@total}" if @total
-
-      base
+      @total ? "#{base} #{tally_to_s} => #{@total}" : base
     end
 
     private

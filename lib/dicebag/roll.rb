@@ -20,10 +20,10 @@ module DiceBag
       arr = []
       fmt = "For %s: %s\n"
 
-      tree.each do |_op, part|
-        if part.is_a?(RollPart) && !part.notes.empty?
-          arr.push format(fmt, part, part.notes)
-        end
+      tree.each_value do |part|
+        next unless part.is_a?(RollPart) && !part.notes.empty?
+
+        arr.push format(fmt, part, part.notes)
       end
 
       arr
@@ -51,12 +51,25 @@ module DiceBag
       @result = Result.new(@label, @total, @sections)
     end
 
+    def average
+      MinMaxCalc.average self
+    end
+
+    def maximum
+      MinMaxCalc.maximum self
+    end
+
+    def minimum
+      MinMaxCalc.minimum self
+    end
+
     private
 
     def handle_tree
       tree.each do |op, part|
         if op == :label
           @label = part.value
+
           next
         end
 

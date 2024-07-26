@@ -4,6 +4,24 @@ describe DiceBag::Roll do
     @roll = DiceBag::Roll.new '(Dice Roll) 3d6 + 2 + 1d4'
   end
 
+  describe 'for the average value' do
+    it 'should be the average of the maximum and minimum values' do
+      _(@roll.average).must_equal 15
+    end
+  end
+
+  describe 'for the maximum value' do
+    it 'should be the maximum of the xdx parts plus 2' do
+      _(@roll.maximum).must_equal 24
+    end
+  end
+
+  describe 'for the minimum value' do
+    it 'should be the minimum of the xdx parts plus 2' do
+      _(@roll.minimum).must_equal 6
+    end
+  end
+
   describe 'before it is rolled' do
     it 'should store the dice string' do
       _(@roll.dstr).must_equal '(Dice Roll) 3d6 + 2 + 1d4'

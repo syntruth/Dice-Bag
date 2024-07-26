@@ -7,6 +7,7 @@ require_relative '../lib/dicebag'
 # Define the Dicebag CLI app
 class DiceBagCLI
   attr_reader :params
+  attr_reader :dstr
 
   def self.call
     new.perform
@@ -18,7 +19,13 @@ class DiceBagCLI
 
   def opts
     @opts ||= OptionParser.new do |args|
-      args.banner = 'Usage: dicebag [-n | --notes] <dice string>'
+      args.banner = 'Usage: dicebag [-n|--notes] [--avg|--max|--min] <string>'
+
+      args.on '--avg', 'Display the average for the roll.'
+
+      args.on '--max', 'Display the maximum for the roll.'
+
+      args.on '--min', 'Display the minimum for the roll.'
 
       args.on '-n', '--notes', 'Display any notes for the roll.'
 
@@ -35,7 +42,28 @@ class DiceBagCLI
 
     nonopts = opts.parse! into: params
 
-    dstr   = nonopts.join(' ')
+    @dstr = nonopts.join(' ')
+
+    return do_average if params[:avg]
+    return do_maximum if params[:max]
+    return do_minimum if params[:min]
+
+    do_roll
+  end
+
+  def do_average
+    puts DiceBag.average dstr
+  end
+
+  def do_maximum
+    puts DiceBag.maximum dstr
+  end
+
+  def do_minimum
+    puts DiceBag.minimum dstr
+  end
+
+  def do_roll
     roll   = DiceBag::Roll.new dstr
     result = roll.roll
 

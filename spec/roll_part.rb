@@ -6,6 +6,24 @@ describe DiceBag::RollPart do
         @part = xdx('3d6').first.last
       end
 
+      describe 'for the average value' do
+        it 'should return the minimum + maximum sum divided by two' do
+          _(@part.average).must_equal 10.5
+        end
+      end
+
+      describe 'for the maximum value' do
+        it 'should give the number of dice times the sides' do
+          _(@part.maximum).must_equal(@part.count * @part.sides)
+        end
+      end
+
+      describe 'for the minimum value' do
+        it 'should give the number of dice' do
+          _(@part.minimum).must_equal @part.count
+        end
+      end
+
       describe 'before it rolls' do
         it 'must not have rolled' do
           _(@part.rolled?).must_equal false

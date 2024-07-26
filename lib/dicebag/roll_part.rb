@@ -12,7 +12,7 @@ module DiceBag
     attr_reader :reroll_count
 
     def initialize(part)
-      super part
+      super(part)
 
       @total   = nil
       @tally   = []
@@ -44,7 +44,7 @@ module DiceBag
 
     # Checks to see if this instance has rolled yet or not.
     def rolled?
-      @total.nil? ? false : true
+      !@total.nil?
     end
 
     def roll
@@ -87,6 +87,18 @@ module DiceBag
       @total
     end
 
+    def average
+      (minimum + maximum) / 2.0
+    end
+
+    def maximum
+      count * sides
+    end
+
+    def minimum
+      count
+    end
+
     def <=>(other)
       total <=> other.total
     end
@@ -111,10 +123,10 @@ module DiceBag
     def roll_die
       num = __roll_die
 
+      return num unless options[:reroll].positive?
+
       # Handle Reroll
-      if options[:reroll].positive?
-        num = __roll_die while num <= @options[:reroll]
-      end
+      num = __roll_die while num <= @options[:reroll]
 
       num
     end

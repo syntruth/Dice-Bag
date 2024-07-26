@@ -1,5 +1,14 @@
 # DiceBag
 
+## Version 3.3.3
+
+- Introduce `average`, `maximum`, and `minimum` methods on the Roll
+  object, which is handled by the `MinMaxCalc` service class. Max
+  returns the highest roll possible, and min naturally returns the
+  lowest roll possible, and average returns a float between those.
+- Updated the `dicebag` executable to have new options for the above new
+  methods.
+
 ## Version 3.3.2
 
 - Update: Allow 4 digit numbers in dice strings.
